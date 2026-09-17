@@ -1,6 +1,6 @@
 /* =========================================================
    Eyakub Shop — Storefront Logic
-   ========================================================= */
+========================================================= */
 
 let ALL_PRODUCTS = [];
 let CURRENT_PRODUCT = null;
@@ -9,202 +9,784 @@ let SELECTED_SIZE = null;
 let QTY = 1;
 let CURRENT_IMAGES = [];
 
-document.getElementById('yearNow').textContent = new Date().getFullYear();
-document.getElementById('shopTagline').textContent = SHOP_INFO.tagline;
-document.getElementById('footerAddress').textContent = SHOP_INFO.address;
-document.getElementById('footerWa').textContent = '+' + SHOP_INFO.whatsapp;
 
-function waLink(msg){
-  return 'https://wa.me/' + SHOP_INFO.whatsapp + '?text=' + encodeURIComponent(msg);
-}
-const defaultWaMsg = 'আসসালামু আলাইকুম, আমি ' + SHOP_INFO.name + ' থেকে একটি জুতা অর্ডার করতে চাই।';
-document.getElementById('waHeaderBtn').href = waLink(defaultWaMsg);
-document.getElementById('waPromoBtn').href = waLink(defaultWaMsg);
-document.getElementById('footerWaLink').href = waLink(defaultWaMsg);
-document.getElementById('floatWaBtn').href = waLink(defaultWaMsg);
+/* =========================
+   SHOP INFO
+========================= */
 
-function money(n){
-  return '৳' + Number(n).toLocaleString('en-US');
-}
+const SHOP = {
+  name: "Eyakub Shop",
+  whatsapp: "966567225245",
+  facebook: "https://www.facebook.com/profile.php?id=61594226919156",
+  tagline: "অরিজিনাল জুতার সেরা কালেকশন",
+  address: "বাংলাদেশ"
+};
 
-/* ---------- Load products (Firestore if configured, else demo data) ---------- */
-async function loadProducts(){
-  if (FIREBASE_CONFIGURED) {
-    try{
-      const snap = await db.collection('products').orderBy('createdAt','desc').get();
-      ALL_PRODUCTS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }catch(e){
-      console.error('Firestore থেকে প্রোডাক্ট লোড করতে সমস্যা হয়েছে:', e);
-      ALL_PRODUCTS = DEMO_PRODUCTS;
-    }
-  } else {
-    ALL_PRODUCTS = DEMO_PRODUCTS;
-  }
-  renderGrid(ALL_PRODUCTS, 'productGrid');
-  document.getElementById('productCount').textContent = ALL_PRODUCTS.length + ' টি প্রোডাক্ট';
+
+/* =========================
+   SAFE ELEMENT HELPER
+========================= */
+
+function el(id){
+  return document.getElementById(id);
 }
 
-function renderGrid(list, elId){
-  const grid = document.getElementById(elId);
-  if (!list.length){
-    grid.innerHTML = '<p class="empty-note">এখন কোনো প্রোডাক্ট নেই। শীঘ্রই যুক্ত করা হবে।</p>';
-    return;
-  }
-  grid.innerHTML = list.map(p => {
-    const img = (p.images && p.images[0]) ? p.images[0] : placeholderImg(p.name);
-    const hasDiscount = p.oldPrice && Number(p.oldPrice) > Number(p.price);
-    const discountPct = hasDiscount ? Math.round(100 - (p.price / p.oldPrice) * 100) : 0;
-    const lowStock = Number(p.stock) > 0 && Number(p.stock) <= 5;
-    return `
-      <div class="product-card" onclick="openModal('${p.id}')">
-        <div class="p-img">
-          <img src="${img}" alt="${escapeHtml(p.name)}">
-          ${hasDiscount ? `<span class="badge-discount">-${discountPct}%</span>` : ''}
-          ${lowStock ? `<span class="badge-stock">মাত্র ${p.stock} পিছ বাকি</span>` : ''}
-        </div>
-        <div class="p-info">
-          <div class="p-name">${escapeHtml(p.name)}</div>
-          <div class="p-price">
-            <span class="now">${money(p.price)}</span>
-            ${hasDiscount ? `<span class="old">${money(p.oldPrice)}</span>` : ''}
-          </div>
-          <button class="p-order-btn" onclick="event.stopPropagation(); openModal('${p.id}')">অর্ডার করুন</button>
-        </div>
-      </div>`;
-  }).join('');
+
+/* =========================
+   INITIAL PAGE DATA
+========================= */
+
+if(el("yearNow")){
+  el("yearNow").textContent = new Date().getFullYear();
 }
+
+if(el("shopTagline")){
+  el("shopTagline").textContent = SHOP.tagline;
+}
+
+if(el("footerAddress")){
+  el("footerAddress").textContent = SHOP.address;
+}
+
+if(el("footerWa")){
+  el("footerWa").textContent = "+" + SHOP.whatsapp;
+}
+
+
+/* =========================
+   WHATSAPP
+========================= */
+
+function waLink(message){
+  return "https://wa.me/" +
+    SHOP.whatsapp +
+    "?text=" +
+    encodeURIComponent(message);
+}
+
+const defaultWaMessage =
+  "আসসালামু আলাইকুম, আমি " +
+  SHOP.name +
+  " থেকে একটি জুতা অর্ডার করতে চাই।";
+
+if(el("waHeaderBtn")){
+  el("waHeaderBtn").href = waLink(defaultWaMessage);
+}
+
+if(el("waPromoBtn")){
+  el("waPromoBtn").href = waLink(defaultWaMessage);
+}
+
+if(el("footerWaLink")){
+  el("footerWaLink").href = waLink(defaultWaMessage);
+}
+
+if(el("floatWaBtn")){
+  el("floatWaBtn").href = waLink(defaultWaMessage);
+}
+
+
+/* =========================
+   MONEY
+========================= */
+
+function money(number){
+
+  const value = Number(number || 0);
+
+  return "৳" +
+    value.toLocaleString("en-US");
+}
+
+
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(value){
+
+  return String(value || "")
+    .replace(/[&<>"']/g, function(char){
+
+      return {
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[char];
+
+    });
+}
+
+
+/* =========================
+   PLACEHOLDER IMAGE
+========================= */
 
 function placeholderImg(name){
-  const initials = encodeURIComponent((name||'Shoe').slice(0,2));
-  return `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%25' height='100%25' fill='%23F1EFE9'/><text x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.3em' fill='%23c9c4b5'>${initials}</text></svg>`;
-}
-function escapeHtml(str){
-  return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  const text =
+    encodeURIComponent(
+      String(name || "Shoe").slice(0,2)
+    );
+
+  return `
+data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg'
+width='500'
+height='500'>
+<rect width='100%' height='100%'
+fill='%23F1EFE9'/>
+<text x='50%' y='50%'
+font-size='65'
+text-anchor='middle'
+dy='.3em'
+fill='%23c9c4b5'>
+${text}
+</text>
+</svg>`;
 }
 
-/* ---------- Search ---------- */
-function doSearch(e){
-  e.preventDefault();
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  const filtered = q ? ALL_PRODUCTS.filter(p => (p.name||'').toLowerCase().includes(q)) : ALL_PRODUCTS;
-  renderGrid(filtered, 'productGrid');
-  document.getElementById('products').scrollIntoView({behavior:'smooth'});
+
+/* =========================
+   LOAD PRODUCTS
+========================= */
+
+async function loadProducts(){
+
+  const grid = el("productGrid");
+
+  if(grid){
+    grid.innerHTML =
+      '<p class="empty-note">প্রোডাক্ট লোড হচ্ছে...</p>';
+  }
+
+  try{
+
+    /*
+      Firebase থাকলে Firestore থেকে
+      product load হবে।
+    */
+
+    if(
+      typeof firebase !== "undefined" &&
+      typeof db !== "undefined"
+    ){
+
+      const snapshot =
+        await db
+          .collection("products")
+          .orderBy("createdAt","desc")
+          .get();
+
+      ALL_PRODUCTS =
+        snapshot.docs.map(function(doc){
+
+          return {
+            id: doc.id,
+            ...doc.data()
+          };
+
+        });
+
+    }else{
+
+      /*
+        Firebase না থাকলে demo products
+      */
+
+      ALL_PRODUCTS = getDemoProducts();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Products loading error:",
+      error
+    );
+
+    /*
+      Firestore error হলেও website blank
+      থাকবে না।
+    */
+
+    ALL_PRODUCTS = getDemoProducts();
+
+  }
+
+
+  renderGrid(
+    ALL_PRODUCTS,
+    "productGrid"
+  );
+
+  if(el("productCount")){
+
+    el("productCount").textContent =
+      ALL_PRODUCTS.length +
+      " টি প্রোডাক্ট";
+
+  }
+
+}
+
+
+/* =========================
+   DEMO PRODUCTS
+========================= */
+
+function getDemoProducts(){
+
+  return [
+
+    {
+      id:"demo-1",
+      name:"Classic Premium Sneaker",
+      price:1490,
+      oldPrice:1890,
+      stock:10,
+      category:"sneakers",
+      colors:["Black","White"],
+      sizes:["40","41","42","43"],
+      images:[],
+      description:
+        "প্রিমিয়াম কোয়ালিটির স্টাইলিশ স্নিকার্স।"
+    },
+
+    {
+      id:"demo-2",
+      name:"Premium Formal Shoe",
+      price:1790,
+      oldPrice:2190,
+      stock:7,
+      category:"formal",
+      colors:["Black","Brown"],
+      sizes:["40","41","42","43","44"],
+      images:[],
+      description:
+        "অফিস ও ফরমাল ব্যবহারের জন্য সুন্দর জুতা।"
+    },
+
+    {
+      id:"demo-3",
+      name:"Comfortable Sandal",
+      price:990,
+      oldPrice:1290,
+      stock:12,
+      category:"sandals",
+      colors:["Black","Brown"],
+      sizes:["40","41","42","43"],
+      images:[],
+      description:
+        "প্রতিদিনের ব্যবহারের জন্য আরামদায়ক স্যান্ডেল।"
+    },
+
+    {
+      id:"demo-4",
+      name:"Sports Running Shoe",
+      price:1590,
+      oldPrice:1990,
+      stock:5,
+      category:"sports",
+      colors:["Black","Blue"],
+      sizes:["40","41","42","43"],
+      images:[],
+      description:
+        "হাঁটা ও স্পোর্টস ব্যবহারের জন্য হালকা জুতা।"
+    }
+
+  ];
+
+}
+
+
+/* =========================
+   RENDER PRODUCTS
+========================= */
+
+function renderGrid(list, elementId){
+
+  const grid = el(elementId);
+
+  if(!grid){
+    return;
+  }
+
+  if(!Array.isArray(list) || !list.length){
+
+    grid.innerHTML =
+      '<p class="empty-note">এখন কোনো প্রোডাক্ট নেই।</p>';
+
+    return;
+  }
+
+
+  grid.innerHTML =
+    list.map(function(product){
+
+      const image =
+        product.images &&
+        product.images.length
+          ? product.images[0]
+          : placeholderImg(product.name);
+
+
+      const price =
+        Number(product.price || 0);
+
+      const oldPrice =
+        Number(product.oldPrice || 0);
+
+
+      const hasDiscount =
+        oldPrice > price;
+
+
+      const discount =
+        hasDiscount
+          ? Math.round(
+              100 -
+              (price / oldPrice) * 100
+            )
+          : 0;
+
+
+      const stock =
+        Number(product.stock || 0);
+
+
+      const lowStock =
+        stock > 0 && stock <= 5;
+
+
+      return `
+
+      <div
+        class="product-card"
+        onclick="openModal('${product.id}')"
+      >
+
+        <div class="p-img">
+
+          <img
+            src="${image}"
+            alt="${escapeHtml(product.name)}"
+            loading="lazy"
+          >
+
+          ${
+            hasDiscount
+              ? `<span class="badge-discount">
+                  -${discount}%
+                 </span>`
+              : ""
+          }
+
+          ${
+            lowStock
+              ? `<span class="badge-stock">
+                  মাত্র ${stock} পিছ বাকি
+                 </span>`
+              : ""
+          }
+
+        </div>
+
+
+        <div class="p-info">
+
+          <div class="p-name">
+            ${escapeHtml(product.name)}
+          </div>
+
+
+          <div class="p-price">
+
+            <span class="now">
+              ${money(price)}
+            </span>
+
+            ${
+              hasDiscount
+                ? `<span class="old">
+                    ${money(oldPrice)}
+                   </span>`
+                : ""
+            }
+
+          </div>
+
+
+          <button
+            class="p-order-btn"
+            onclick="event.stopPropagation();openModal('${product.id}')"
+          >
+            অর্ডার করুন
+          </button>
+
+        </div>
+
+      </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function doSearch(event){
+
+  if(event){
+    event.preventDefault();
+  }
+
+  const input = el("searchInput");
+
+  const query =
+    input
+      ? input.value.trim().toLowerCase()
+      : "";
+
+
+  if(!query){
+
+    renderGrid(
+      ALL_PRODUCTS,
+      "productGrid"
+    );
+
+  }else{
+
+    const filtered =
+      ALL_PRODUCTS.filter(function(product){
+
+        const name =
+          String(product.name || "")
+            .toLowerCase();
+
+        const category =
+          String(product.category || "")
+            .toLowerCase();
+
+        return (
+          name.includes(query) ||
+          category.includes(query)
+        );
+
+      });
+
+
+    renderGrid(
+      filtered,
+      "productGrid"
+    );
+
+  }
+
+
+  const productsSection =
+    el("products");
+
+  if(productsSection){
+
+    productsSection.scrollIntoView({
+      behavior:"smooth"
+    });
+
+  }
+
   return false;
 }
 
-/* ---------- Product Modal ---------- */
-function openModal(id){
-  const p = ALL_PRODUCTS.find(x => x.id === id);
-  if (!p) return;
-  CURRENT_PRODUCT = p;
-  SELECTED_COLOR = (p.colors && p.colors[0]) || null;
-  SELECTED_SIZE = (p.sizes && p.sizes[0]) || null;
-  QTY = 1;
-  CURRENT_IMAGES = (p.images && p.images.length) ? p.images : [placeholderImg(p.name)];
 
-  document.getElementById('modalName').textContent = p.name;
-  document.getElementById('modalPrice').textContent = money(p.price);
-  const hasDiscount = p.oldPrice && Number(p.oldPrice) > Number(p.price);
-  document.getElementById('modalOldPrice').textContent = hasDiscount ? money(p.oldPrice) : '';
-  document.getElementById('modalStock').textContent = Number(p.stock) > 0
-    ? `স্টকে আছে: ${p.stock} পিছ` : 'বর্তমানে স্টক আউট';
-  document.getElementById('modalDesc').textContent = p.description || '';
-  document.getElementById('qtyVal').textContent = QTY;
+/* =========================
+   CATEGORY FILTER
+========================= */
 
-  document.getElementById('modalMainImg').src = CURRENT_IMAGES[0];
-  document.getElementById('modalThumbs').innerHTML = CURRENT_IMAGES.map((im,i) =>
-    `<img src="${im}" class="${i===0?'active':''}" onclick="setMainImg(${i})">`).join('');
+function filterCategory(category){
 
-  renderPills('colorGroup','colorPills', p.colors, 'color');
-  renderPills('sizeGroup','sizePills', p.sizes, 'size');
+  if(category === "all"){
 
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function setMainImg(i){
-  document.getElementById('modalMainImg').src = CURRENT_IMAGES[i];
-  document.querySelectorAll('.modal-thumbs img').forEach((el,idx)=> el.classList.toggle('active', idx===i));
-}
-function renderPills(groupId, pillsId, values, type){
-  const group = document.getElementById(groupId);
-  if (!values || !values.length){ group.style.display='none'; return; }
-  group.style.display='block';
-  document.getElementById(pillsId).innerHTML = values.map((v,i) =>
-    `<span class="opt-pill ${i===0?'selected':''}" onclick="selectPill(this,'${type}','${escapeHtml(v)}')">${escapeHtml(v)}</span>`
-  ).join('');
-}
-function selectPill(el, type, value){
-  el.parentElement.querySelectorAll('.opt-pill').forEach(p=>p.classList.remove('selected'));
-  el.classList.add('selected');
-  if (type==='color') SELECTED_COLOR = value; else SELECTED_SIZE = value;
-}
-function changeQty(delta){
-  QTY = Math.max(1, QTY + delta);
-  document.getElementById('qtyVal').textContent = QTY;
-}
-function closeModal(){
-  document.getElementById('modalOverlay').classList.remove('open');
-  // Related products: show others excluding current
-  const related = ALL_PRODUCTS.filter(p => p.id !== (CURRENT_PRODUCT && CURRENT_PRODUCT.id)).slice(0,8);
-  renderGrid(related, 'relatedGrid');
-}
-document.getElementById('modalOverlay').addEventListener('click', (e)=>{
-  if (e.target.id === 'modalOverlay') closeModal();
-});
+    renderGrid(
+      ALL_PRODUCTS,
+      "productGrid"
+    );
 
-/* ---------- Submit order ---------- */
-async function submitOrder(){
-  const name = document.getElementById('custName').value.trim();
-  const phone = document.getElementById('custPhone').value.trim();
-  const address = document.getElementById('custAddress').value.trim();
-  const note = document.getElementById('custNote').value.trim();
+  }else{
 
-  if (!name || !phone || !address){
-    alert('অনুগ্রহ করে নাম, ফোন নাম্বার এবং ঠিকানা পূরণ করুন।');
-    return;
-  }
-  if (Number(CURRENT_PRODUCT.stock) <= 0){
-    alert('দুঃখিত, এই প্রোডাক্টটি বর্তমানে স্টকে নেই।');
-    return;
-  }
+    const filtered =
+      ALL_PRODUCTS.filter(function(product){
 
-  const orderMsg =
-`আসসালামু আলাইকুম, আমি একটি অর্ডার দিতে চাই:
+        return String(
+          product.category || ""
+        ).toLowerCase() ===
+        String(category).toLowerCase();
 
-পণ্য: ${CURRENT_PRODUCT.name}
-কালার: ${SELECTED_COLOR || '—'}
-সাইজ: ${SELECTED_SIZE || '—'}
-পরিমাণ: ${QTY}
-মূল্য: ${money(CURRENT_PRODUCT.price)} x ${QTY} = ${money(CURRENT_PRODUCT.price * QTY)}
-
-নাম: ${name}
-ফোন: ${phone}
-ঠিকানা: ${address}
-নোট: ${note || '—'}`;
-
-  // Firestore-এ অর্ডার সংরক্ষণ (Admin panel-এ দেখা যাবে)
-  if (FIREBASE_CONFIGURED){
-    try{
-      await db.collection('orders').add({
-        productId: CURRENT_PRODUCT.id,
-        productName: CURRENT_PRODUCT.name,
-        price: CURRENT_PRODUCT.price,
-        color: SELECTED_COLOR || '',
-        size: SELECTED_SIZE || '',
-        qty: QTY,
-        customerName: name,
-        customerPhone: phone,
-        customerAddress: address,
-        note: note || '',
-        status: 'নতুন',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-    }catch(e){
-      console.error('অর্ডার সংরক্ষণ করতে সমস্যা হয়েছে:', e);
-    }
+
+
+    renderGrid(
+      filtered,
+      "productGrid"
+    );
+
   }
 
-  window.open(waLink(orderMsg), '_blank');
-  closeModal();
+
+  const section =
+    el("products");
+
+  if(section){
+
+    section.scrollIntoView({
+      behavior:"smooth"
+    });
+
+  }
+
 }
 
-loadProducts();
+
+/* =========================
+   OPEN PRODUCT MODAL
+========================= */
+
+function openModal(id){
+
+  const product =
+    ALL_PRODUCTS.find(function(item){
+
+      return String(item.id) === String(id);
+
+    });
+
+
+  if(!product){
+    return;
+  }
+
+
+  CURRENT_PRODUCT = product;
+
+  SELECTED_COLOR =
+    product.colors &&
+    product.colors.length
+      ? product.colors[0]
+      : null;
+
+
+  SELECTED_SIZE =
+    product.sizes &&
+    product.sizes.length
+      ? product.sizes[0]
+      : null;
+
+
+  QTY = 1;
+
+
+  CURRENT_IMAGES =
+    product.images &&
+    product.images.length
+      ? product.images
+      : [
+          placeholderImg(product.name)
+        ];
+
+
+  if(el("modalName")){
+    el("modalName").textContent =
+      product.name || "";
+  }
+
+
+  if(el("modalPrice")){
+    el("modalPrice").textContent =
+      money(product.price);
+  }
+
+
+  const oldPrice =
+    Number(product.oldPrice || 0);
+
+  const price =
+    Number(product.price || 0);
+
+
+  if(el("modalOldPrice")){
+
+    el("modalOldPrice").textContent =
+      oldPrice > price
+        ? money(oldPrice)
+        : "";
+
+  }
+
+
+  if(el("modalStock")){
+
+    el("modalStock").textContent =
+      Number(product.stock || 0) > 0
+        ? "স্টকে আছে: " +
+          product.stock +
+          " পিছ"
+        : "বর্তমানে স্টক আউট";
+
+  }
+
+
+  if(el("modalDesc")){
+
+    el("modalDesc").textContent =
+      product.description || "";
+
+  }
+
+
+  if(el("qtyVal")){
+    el("qtyVal").textContent = "1";
+  }
+
+
+  if(el("modalMainImg")){
+
+    el("modalMainImg").src =
+      CURRENT_IMAGES[0];
+
+  }
+
+
+  if(el("modalThumbs")){
+
+    el("modalThumbs").innerHTML =
+      CURRENT_IMAGES.map(
+        function(image,index){
+
+          return `
+          <img
+            src="${image}"
+            class="${index === 0 ? "active" : ""}"
+            onclick="setMainImg(${index})"
+            alt=""
+          >
+          `;
+
+        }
+      ).join("");
+
+  }
+
+
+  renderPills(
+    "colorGroup",
+    "colorPills",
+    product.colors,
+    "color"
+  );
+
+
+  renderPills(
+    "sizeGroup",
+    "sizePills",
+    product.sizes,
+    "size"
+  );
+
+
+  if(el("modalOverlay")){
+
+    el("modalOverlay")
+      .classList
+      .add("open");
+
+  }
+
+}
+
+
+/* =========================
+   MAIN IMAGE
+========================= */
+
+function setMainImg(index){
+
+  if(
+    !CURRENT_IMAGES[index] ||
+    !el("modalMainImg")
+  ){
+    return;
+  }
+
+
+  el("modalMainImg").src =
+    CURRENT_IMAGES[index];
+
+
+  document
+    .querySelectorAll(".modal-thumbs img")
+    .forEach(function(image,i){
+
+      image.classList.toggle(
+        "active",
+        i === index
+      );
+
+    });
+
+}
+
+
+/* =========================
+   COLOR / SIZE PILLS
+========================= */
+
+function renderPills(
+  groupId,
+  pillsId,
+  values,
+  type
+){
+
+  const group = el(groupId);
+  const container = el(pillsId);
+
+  if(!group || !container){
+    return;
+  }
+
+
+  if(!values || !values.length){
+
+    group.style.display = "none";
+
+    return;
+
+  }
+
+
+  group.style.display = "block";
+
+
+  container.innerHTML =
+    values.map(
+      function(value,index){
+
+        return `
+
+        <span
+          class="opt-pill ${
+            index === 0
+              ? "selected"
+              : ""
+          }"
+          onclick="
+            selectPill(
+              this,
+              '${type
