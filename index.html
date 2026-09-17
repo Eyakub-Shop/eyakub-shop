@@ -11,74 +11,79 @@
 </head>
 <body>
 
-<div class="topbar">
-  <div class="container">
-    <span>স্বাগতম Eyakub Shop-এ — অরিজিনাল প্রোডাক্ট, সরাসরি WhatsApp-এ অর্ডার করুন</span>
-    <a href="admin.html">Admin</a>
-  </div>
-</div>
-
 <header class="site-header">
   <div class="container header-row">
-    <div class="logo"><span class="dot">E</span>yakub Shop</div>
+    <div class="logo"><span class="logo-icon">🛍️</span><span class="logo-text">Eyakub Shop</span></div>
     <form class="search-box" onsubmit="return doSearch(event)">
       <input id="searchInput" type="text" placeholder="জুতা খুঁজুন...">
-      <button type="submit">খুঁজুন</button>
+      <button type="submit">🔍</button>
     </form>
     <div class="header-actions">
-      <a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank" title="আমাদের Facebook পেজ">📘</a>
+      <a href="admin.html">👤 Admin</a>
+      <a href="__FB_LINK__" target="_blank">📘 Facebook</a>
       <a class="whatsapp-pill" id="waHeaderBtn" target="_blank">💬 অর্ডার করুন</a>
     </div>
   </div>
   <nav class="main-nav">
     <div class="container">
-      <ul>
-        <li><a href="#home">হোম</a></li>
-        <li><a href="#products">শপ</a></li>
-        <li><a href="#about">আমাদের সম্পর্কে</a></li>
-        <li><a href="#contact">যোগাযোগ</a></li>
-        <li><a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank">ফেসবুক পেজ</a></li>
+      <ul id="navCategoryList">
+        <li><a href="#home" class="home-link">🏠 হোম</a></li>
+        <li><a href="#products">🛍️ সব প্রোডাক্ট</a></li>
+        <li><a href="#about">ℹ️ আমাদের সম্পর্কে</a></li>
+        <li><a href="#contact">📞 যোগাযোগ</a></li>
       </ul>
     </div>
   </nav>
 </header>
 
 <div class="container" id="home">
+
+  <div class="cat-icon-strip" id="catIconStrip"></div>
+
   <div class="hero">
-    <div class="hero-panel big">
-      <div>
-        <span class="hero-tag">Fashion</span>
-        <h1 id="shopTagline">অরিজিনাল জুতার সেরা কালেকশন</h1>
-        <a href="#products" class="btn-cta">শপ করুন</a>
-      </div>
-    </div>
-    <div class="hero-panel small">
-      <div>
-        <span class="hero-tag">New Arrival</span>
-        <h1>৩০০+ জোড়া অরিজিনাল জুতা স্টকে আছে</h1>
-        <a href="#products" class="btn-cta">দেখুন</a>
-      </div>
+    <div>
+      <span class="hero-tag">Fashion</span>
+      <h1 id="shopTagline">অরিজিনাল জুতার সেরা কালেকশন</h1>
+      <p>১০০% অরিজিনাল প্রোডাক্ট, সারা দেশে ডেলিভারি, ক্যাশ অন ডেলিভারি সুবিধা</p>
+      <a href="#products" class="btn-cta">শপ করুন</a>
     </div>
   </div>
 
-  <div class="cat-strip">
-    <div class="cat-card cat-1"><h3>স্নিকার্স</h3><span class="go">দেখুন</span></div>
-    <div class="cat-card cat-2"><h3>ফরমাল শু</h3><span class="go">দেখুন</span></div>
-    <div class="cat-card cat-3"><h3>স্যান্ডেল</h3><span class="go">দেখুন</span></div>
-    <div class="cat-card cat-4"><h3>স্পোর্টস শু</h3><span class="go">দেখুন</span></div>
+  <div class="service-strip">
+    <div class="service-item"><span class="ic">🚚</span><div><strong>সারা দেশে ডেলিভারি</strong><span>দ্রুত ও নিরাপদ</span></div></div>
+    <div class="service-item"><span class="ic">🛡️</span><div><strong>নিরাপদ পেমেন্ট</strong><span>ক্যাশ অন ডেলিভারি</span></div></div>
+    <div class="service-item"><span class="ic">🔄</span><div><strong>১০০% অরিজিনাল</strong><span>মানসম্পন্ন পণ্য</span></div></div>
+    <div class="service-item"><span class="ic">🎧</span><div><strong>সাপোর্ট</strong><span>WhatsApp-এ যোগাযোগ করুন</span></div></div>
   </div>
+
+  <div class="section-head" id="flashHead" style="display:none;">
+    <h2>⚡ ফ্ল্যাশ সেল</h2>
+    <div class="countdown" id="countdownBox">
+      শেষ হতে বাকি:
+      <span class="box" id="cdH">00</span>:<span class="box" id="cdM">00</span>:<span class="box" id="cdS">00</span>
+    </div>
+  </div>
+  <div class="product-grid" id="flashGrid"></div>
 
   <div class="section-head" id="products">
-    <h2>ট্রেন্ডিং প্রোডাক্ট</h2>
-    <span id="productCount"></span>
+    <h2>🔥 জনপ্রিয় প্রোডাক্ট</h2>
+    <span class="see-all" id="productCount"></span>
   </div>
   <div class="product-grid" id="productGrid">
     <p class="empty-note">প্রোডাক্ট লোড হচ্ছে...</p>
   </div>
 
-  <div class="promo-bar">
-    <p>💳 ক্যাশ অন ডেলিভারি সুবিধা আছে — অর্ডার করতে WhatsApp-এ মেসেজ করুন অথবা প্রোডাক্টে ক্লিক করে ফর্ম পূরণ করুন।</p>
-    <a class="btn-cta" id="waPromoBtn" target="_blank">অর্ডার করুন</a>
+  <div class="promo-grid">
+    <div class="promo-card a">
+      <h3>নতুন কালেকশন</h3>
+      <p>সব সময় নতুন ও ট্রেন্ডি ডিজাইন যুক্ত হচ্ছে আমাদের কালেকশনে</p>
+      <a href="#products" class="btn-cta">দেখুন</a>
+    </div>
+    <div class="promo-card b">
+      <h3>স্পেশাল অফার</h3>
+      <p>নির্বাচিত প্রোডাক্টে চলছে বিশেষ ছাড় — এখনই অর্ডার করুন</p>
+      <a href="#products" class="btn-cta">অফার দেখুন</a>
+    </div>
   </div>
 </div>
 
@@ -132,7 +137,7 @@
 </div>
 
 <div class="section-head container" style="margin-top:10px;">
-  <h2>আরও প্রোডাক্ট দেখুন</h2>
+  <h2>🛍️ আরও প্রোডাক্ট দেখুন</h2>
 </div>
 <div class="container product-grid" id="relatedGrid" style="margin-bottom:40px;"></div>
 
@@ -141,6 +146,10 @@
     <div>
       <h4>Eyakub Shop</h4>
       <p style="font-size:13.5px;">আমরা বিক্রি করি ১০০% অরিজিনাল ও কোয়ালিটিসম্পন্ন জুতা। সন্তুষ্টিই আমাদের লক্ষ্য।</p>
+      <div class="footer-social">
+        <a href="__FB_LINK__" target="_blank">📘</a>
+        <a id="footerWaLink" target="_blank">💬</a>
+      </div>
     </div>
     <div>
       <h4>কুইক লিংক</h4>
@@ -158,10 +167,10 @@
       </ul>
     </div>
     <div>
-      <h4>আমাদের ফলো করুন</h4>
+      <h4>গুরুত্বপূর্ণ লিংক</h4>
       <ul>
-        <li><a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank">📘 Facebook Page</a></li>
-        <li><a id="footerWaLink" target="_blank">💬 WhatsApp</a></li>
+        <li><a href="admin.html">Admin Panel</a></li>
+        <li><a href="__FB_LINK__" target="_blank">Facebook Page</a></li>
       </ul>
     </div>
   </div>
@@ -179,4 +188,4 @@
 <script src="firebase-config.js"></script>
 <script src="app.js"></script>
 </body>
-  </html>
+</html>
