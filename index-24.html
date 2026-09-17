@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eyakub Shop — অরিজিনাল জুতার কালেকশন</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👟</text></svg>">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <span>স্বাগতম Eyakub Shop-এ — অরিজিনাল প্রোডাক্ট, সরাসরি WhatsApp-এ অর্ডার করুন</span>
+    <a href="admin.html">Admin</a>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-row">
+    <div class="logo"><span class="dot">E</span>yakub Shop</div>
+    <form class="search-box" onsubmit="return doSearch(event)">
+      <input id="searchInput" type="text" placeholder="জুতা খুঁজুন...">
+      <button type="submit">খুঁজুন</button>
+    </form>
+    <div class="header-actions">
+      <a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank" title="আমাদের Facebook পেজ">📘</a>
+      <a class="whatsapp-pill" id="waHeaderBtn" target="_blank">💬 অর্ডার করুন</a>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <div class="container">
+      <ul>
+        <li><a href="#home">হোম</a></li>
+        <li><a href="#products">শপ</a></li>
+        <li><a href="#about">আমাদের সম্পর্কে</a></li>
+        <li><a href="#contact">যোগাযোগ</a></li>
+        <li><a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank">ফেসবুক পেজ</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div class="container" id="home">
+  <div class="hero">
+    <div class="hero-panel big">
+      <div>
+        <span class="hero-tag">Fashion</span>
+        <h1 id="shopTagline">অরিজিনাল জুতার সেরা কালেকশন</h1>
+        <a href="#products" class="btn-cta">শপ করুন</a>
+      </div>
+    </div>
+    <div class="hero-panel small">
+      <div>
+        <span class="hero-tag">New Arrival</span>
+        <h1>৩০০+ জোড়া অরিজিনাল জুতা স্টকে আছে</h1>
+        <a href="#products" class="btn-cta">দেখুন</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-strip">
+    <div class="cat-card cat-1"><h3>স্নিকার্স</h3><span class="go">দেখুন</span></div>
+    <div class="cat-card cat-2"><h3>ফরমাল শু</h3><span class="go">দেখুন</span></div>
+    <div class="cat-card cat-3"><h3>স্যান্ডেল</h3><span class="go">দেখুন</span></div>
+    <div class="cat-card cat-4"><h3>স্পোর্টস শু</h3><span class="go">দেখুন</span></div>
+  </div>
+
+  <div class="section-head" id="products">
+    <h2>ট্রেন্ডিং প্রোডাক্ট</h2>
+    <span id="productCount"></span>
+  </div>
+  <div class="product-grid" id="productGrid">
+    <p class="empty-note">প্রোডাক্ট লোড হচ্ছে...</p>
+  </div>
+
+  <div class="promo-bar">
+    <p>💳 ক্যাশ অন ডেলিভারি সুবিধা আছে — অর্ডার করতে WhatsApp-এ মেসেজ করুন অথবা প্রোডাক্টে ক্লিক করে ফর্ম পূরণ করুন।</p>
+    <a class="btn-cta" id="waPromoBtn" target="_blank">অর্ডার করুন</a>
+  </div>
+</div>
+
+<!-- ============== Product Modal ============== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-gallery">
+        <img id="modalMainImg" src="" alt="">
+        <div class="modal-thumbs" id="modalThumbs"></div>
+      </div>
+      <div class="modal-info">
+        <h2 id="modalName"></h2>
+        <div class="modal-price">
+          <span class="now" id="modalPrice"></span>
+          <span class="old" id="modalOldPrice"></span>
+        </div>
+        <div class="stock-line" id="modalStock"></div>
+
+        <div class="opt-group" id="colorGroup">
+          <label>কালার বাছাই করুন</label>
+          <div class="opt-pills" id="colorPills"></div>
+        </div>
+        <div class="opt-group" id="sizeGroup">
+          <label>সাইজ বাছাই করুন</label>
+          <div class="opt-pills" id="sizePills"></div>
+        </div>
+        <div class="opt-group">
+          <label>পরিমাণ</label>
+          <div class="qty-row">
+            <button type="button" onclick="changeQty(-1)">−</button>
+            <span id="qtyVal">1</span>
+            <button type="button" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <p class="desc-text" id="modalDesc"></p>
+
+        <div class="order-form">
+          <h3>অর্ডার করতে আপনার তথ্য দিন</h3>
+          <input type="text" id="custName" placeholder="আপনার পুরো নাম *">
+          <input type="tel" id="custPhone" placeholder="ফোন নাম্বার (WhatsApp/Bkash) *">
+          <textarea id="custAddress" rows="2" placeholder="সম্পূর্ণ ঠিকানা (জেলা, থানা, এলাকা) *"></textarea>
+          <input type="text" id="custNote" placeholder="অতিরিক্ত কোনো নোট (ঐচ্ছিক)">
+          <button class="btn-order" onclick="submitOrder()">💬 WhatsApp-এ অর্ডার পাঠান</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-head container" style="margin-top:10px;">
+  <h2>আরও প্রোডাক্ট দেখুন</h2>
+</div>
+<div class="container product-grid" id="relatedGrid" style="margin-bottom:40px;"></div>
+
+<footer id="contact">
+  <div class="container footer-grid">
+    <div>
+      <h4>Eyakub Shop</h4>
+      <p style="font-size:13.5px;">আমরা বিক্রি করি ১০০% অরিজিনাল ও কোয়ালিটিসম্পন্ন জুতা। সন্তুষ্টিই আমাদের লক্ষ্য।</p>
+    </div>
+    <div>
+      <h4>কুইক লিংক</h4>
+      <ul>
+        <li><a href="#home">হোম</a></li>
+        <li><a href="#products">শপ</a></li>
+        <li><a href="#about">আমাদের সম্পর্কে</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>যোগাযোগ</h4>
+      <ul>
+        <li id="footerAddress">ঢাকা, বাংলাদেশ</li>
+        <li>WhatsApp: <span id="footerWa"></span></li>
+      </ul>
+    </div>
+    <div>
+      <h4>আমাদের ফলো করুন</h4>
+      <ul>
+        <li><a href="https://www.facebook.com/profile.php?id=61594226919156" target="_blank">📘 Facebook Page</a></li>
+        <li><a id="footerWaLink" target="_blank">💬 WhatsApp</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <span id="yearNow"></span> Eyakub Shop — সর্বস্বত্ব সংরক্ষিত</span>
+    <span>Powered by GitHub Pages + Firebase</span>
+  </div>
+</footer>
+
+<a class="float-wa" id="floatWaBtn" target="_blank" title="WhatsApp-এ যোগাযোগ করুন">💬</a>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
