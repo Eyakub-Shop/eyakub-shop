@@ -1,5 +1,5 @@
 /* =========================================================
-   Eyakub Shop — Admin Panel
+   Eyakub Shop — Secure Admin Panel
 ========================================================= */
 
 let PRODUCTS = [];
@@ -9,53 +9,56 @@ let PRODUCT_IMAGES = [];
 
 
 /* =========================================================
-   ADMIN EMAIL
+   YOUR ADMIN EMAIL
 ========================================================= */
 
-const ADMIN_EMAIL = "mdeyakub9970@gmail.com";
+const ADMIN_EMAIL = "mdeyakub095@gmail.com";
 
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-function $(id){
+function $(id) {
   return document.getElementById(id);
 }
 
-function show(id){
-  if($(id)) $(id).style.display = "";
+function show(id) {
+  if ($(id)) {
+    $(id).style.display = "";
+  }
 }
 
-function hide(id){
-  if($(id)) $(id).style.display = "none";
+function hide(id) {
+  if ($(id)) {
+    $(id).style.display = "none";
+  }
 }
 
-function money(value){
+function money(value) {
   return "৳" + Number(value || 0).toLocaleString("en-US");
 }
 
-function escapeHtml(value){
-  return String(value || "")
-    .replace(/[&<>"']/g, function(char){
-      return {
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        '"':"&quot;",
-        "'":"&#39;"
-      }[char];
-    });
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
 }
 
 
 /* =========================================================
-   AUTH STATE
+   FIREBASE AUTH
 ========================================================= */
 
-auth.onAuthStateChanged(function(user){
+auth.onAuthStateChanged(function(user) {
 
-  if(!user){
+  if (!user) {
 
     hide("dashboard");
     show("loginBox");
@@ -63,22 +66,24 @@ auth.onAuthStateChanged(function(user){
     return;
   }
 
-  /*
-    শুধু আপনার Admin email Dashboard ব্যবহার করতে পারবে
-  */
 
-  if(
+  /* Only YOUR email can use Admin */
+
+  if (
     user.email.toLowerCase() !==
     ADMIN_EMAIL.toLowerCase()
-  ){
+  ) {
 
     auth.signOut();
 
     $("loginError").textContent =
-      "এই অ্যাকাউন্টের Admin Panel ব্যবহারের অনুমতি নেই।";
+      "এই Gmail-এর Admin Panel ব্যবহারের অনুমতি নেই।";
 
     return;
   }
+
+
+  /* Correct Admin */
 
   hide("loginBox");
   show("dashboard");
@@ -93,7 +98,7 @@ auth.onAuthStateChanged(function(user){
    LOGIN
 ========================================================= */
 
-async function doLogin(){
+async function doLogin() {
 
   const email =
     $("loginEmail").value.trim();
@@ -101,51 +106,85 @@ async function doLogin(){
   const password =
     $("loginPass").value;
 
+
   $("loginError").textContent = "";
 
-  if(!email || !password){
+
+  if (!email || !password) {
 
     $("loginError").textContent =
-      "ইমেইল এবং পাসওয়ার্ড দিন।";
+      "Email এবং Password দিন।";
 
     return;
   }
 
-  try{
+
+  /* Email must match Admin email */
+
+  if (
+    email.toLowerCase() !==
+    ADMIN_EMAIL.toLowerCase()
+  ) {
+
+    $("loginError").textContent =
+      "এই Email Admin হিসেবে অনুমোদিত নয়।";
+
+    return;
+  }
+
+
+  try {
 
     await auth.signInWithEmailAndPassword(
       email,
       password
     );
 
-  }catch(error){
+  } catch (error) {
 
     console.error(error);
 
     let message =
-      "লগইন করা যায়নি। ইমেইল/পাসওয়ার্ড পরীক্ষা করুন।";
+      "Login করা যায়নি।";
 
-    if(error.code === "auth/invalid-credential"){
+
+    if (
+      error.code ===
+      "auth/invalid-credential"
+    ) {
+
       message =
-        "ইমেইল অথবা পাসওয়ার্ড ভুল।";
+        "Email অথবা Password ভুল।";
+
+    } else if (
+      error.code ===
+      "auth/user-not-found"
+    ) {
+
+      message =
+        "এই Email দিয়ে Firebase User তৈরি করা হয়নি।";
+
+    } else if (
+      error.code ===
+      "auth/wrong-password"
+    ) {
+
+      message =
+        "Password ভুল।";
+
+    } else if (
+      error.code ===
+      "auth/too-many-requests"
+    ) {
+
+      message =
+        "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
+
     }
 
-    if(error.code === "auth/user-not-found"){
-      message =
-        "এই ইমেইলে কোনো Firebase account নেই।";
-    }
 
-    if(error.code === "auth/wrong-password"){
-      message =
-        "পাসওয়ার্ড ভুল।";
-    }
-
-    if(error.code === "auth/too-many-requests"){
-      message =
-        "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে চেষ্টা করুন।";
-    }
-
-    $("loginError").textContent = message;
+    $("loginError").textContent =
+      message;
 
   }
 
@@ -156,13 +195,13 @@ async function doLogin(){
    LOGOUT
 ========================================================= */
 
-async function doLogout(){
+async function doLogout() {
 
-  try{
+  try {
 
     await auth.signOut();
 
-  }catch(error){
+  } catch (error) {
 
     console.error(error);
 
@@ -175,9 +214,9 @@ async function doLogout(){
    TAB SWITCH
 ========================================================= */
 
-function switchTab(tab){
+function switchTab(tab) {
 
-  if(tab === "products"){
+  if (tab === "products") {
 
     show("tabProducts");
     hide("tabOrders");
@@ -188,7 +227,7 @@ function switchTab(tab){
     $("tabOrdersBtn")
       .classList.remove("active");
 
-  }else{
+  } else {
 
     hide("tabProducts");
     show("tabOrders");
@@ -210,72 +249,82 @@ function switchTab(tab){
    LOAD PRODUCTS
 ========================================================= */
 
-async function loadProducts(){
+async function loadProducts() {
 
-  try{
+  try {
 
     const snapshot =
       await db
         .collection("products")
-        .orderBy("createdAt","desc")
+        .orderBy("createdAt", "desc")
         .get();
 
+
     PRODUCTS =
-      snapshot.docs.map(function(doc){
+      snapshot.docs.map(function(doc) {
 
         return {
-          id:doc.id,
+          id: doc.id,
           ...doc.data()
         };
 
       });
 
+
     renderProducts();
 
-  }catch(error){
+  } catch (error) {
 
     console.error(
-      "Products load error:",
+      "Product load error:",
       error
     );
 
-    /*
-      Fallback — যদি createdAt order-এ সমস্যা হয়
-    */
 
-    try{
+    /* Fallback */
+
+    try {
 
       const snapshot =
         await db
           .collection("products")
           .get();
 
+
       PRODUCTS =
-        snapshot.docs.map(function(doc){
+        snapshot.docs.map(function(doc) {
 
           return {
-            id:doc.id,
+            id: doc.id,
             ...doc.data()
           };
 
         });
 
-      PRODUCTS.sort(function(a,b){
+
+      PRODUCTS.sort(function(a, b) {
 
         return getTimestamp(b.createdAt) -
                getTimestamp(a.createdAt);
 
       });
 
+
       renderProducts();
 
-    }catch(secondError){
+    } catch (secondError) {
 
       console.error(secondError);
 
-      alert(
-        "প্রোডাক্ট লোড করা যায়নি। Firebase Rules পরীক্ষা করুন।"
-      );
+      $("productTableBody").innerHTML = `
+        <tr>
+          <td colspan="6">
+            <div class="empty-note">
+              প্রোডাক্ট লোড করা যায়নি।
+            </div>
+          </td>
+        </tr>
+      `;
 
     }
 
@@ -288,20 +337,23 @@ async function loadProducts(){
    RENDER PRODUCTS
 ========================================================= */
 
-function renderProducts(){
+function renderProducts() {
 
   const body =
     $("productTableBody");
 
-  if(!body){
+
+  if (!body) {
     return;
   }
+
 
   $("productTotalLabel").textContent =
     "মোট প্রোডাক্ট: " +
     PRODUCTS.length;
 
-  if(!PRODUCTS.length){
+
+  if (!PRODUCTS.length) {
 
     body.innerHTML = `
       <tr>
@@ -316,8 +368,9 @@ function renderProducts(){
     return;
   }
 
+
   body.innerHTML =
-    PRODUCTS.map(function(product){
+    PRODUCTS.map(function(product) {
 
       const image =
         product.images &&
@@ -325,101 +378,113 @@ function renderProducts(){
           ? product.images[0]
           : "";
 
+
       const colors =
         Array.isArray(product.colors)
           ? product.colors.join(", ")
           : "";
+
 
       const sizes =
         Array.isArray(product.sizes)
           ? product.sizes.join(", ")
           : "";
 
+
       return `
 
-      <tr>
+        <tr>
 
-        <td>
-          ${
-            image
-              ? `<img src="${image}" alt="">`
-              : "📦"
-          }
-        </td>
+          <td>
+            ${
+              image
+                ? `<img src="${image}" alt="">`
+                : "📦"
+            }
+          </td>
 
-        <td>
 
-          <strong>
-            ${escapeHtml(product.name)}
-          </strong>
+          <td>
 
-          ${
-            product.category
-              ? `<br>
-                 <small>
-                   ${escapeHtml(product.category)}
-                 </small>`
-              : ""
-          }
+            <strong>
+              ${escapeHtml(product.name)}
+            </strong>
 
-        </td>
+            ${
+              product.category
+                ? `
+                  <br>
+                  <small>
+                    ${escapeHtml(product.category)}
+                  </small>
+                `
+                : ""
+            }
 
-        <td>
+          </td>
 
-          <strong>
-            ${money(product.price)}
-          </strong>
 
-          ${
-            Number(product.oldPrice) >
-            Number(product.price)
-              ? `<br>
-                 <small style="text-decoration:line-through;">
-                   ${money(product.oldPrice)}
-                 </small>`
-              : ""
-          }
+          <td>
 
-        </td>
+            <strong>
+              ${money(product.price)}
+            </strong>
 
-        <td>
-          ${Number(product.stock || 0)}
-        </td>
+            ${
+              Number(product.oldPrice) >
+              Number(product.price)
+                ? `
+                  <br>
+                  <small style="text-decoration:line-through;">
+                    ${money(product.oldPrice)}
+                  </small>
+                `
+                : ""
+            }
 
-        <td>
+          </td>
 
-          <small>
-            ${escapeHtml(colors || "—")}
-          </small>
 
-          <br>
+          <td>
+            ${Number(product.stock || 0)}
+          </td>
 
-          <small>
-            সাইজ:
-            ${escapeHtml(sizes || "—")}
-          </small>
 
-        </td>
+          <td>
 
-        <td class="row-actions">
+            <small>
+              ${escapeHtml(colors || "—")}
+            </small>
 
-          <button
-            class="edit-btn"
-            onclick="editProduct('${product.id}')"
-          >
-            ✏️ Edit
-          </button>
+            <br>
 
-          <button
-            class="delete-btn"
-            onclick="deleteProduct('${product.id}')"
-          >
-            🗑️ Delete
-          </button>
+            <small>
+              সাইজ:
+              ${escapeHtml(sizes || "—")}
+            </small>
 
-        </td>
+          </td>
 
-      </tr>
+
+          <td class="row-actions">
+
+            <button
+              class="edit-btn"
+              onclick="editProduct('${product.id}')"
+            >
+              ✏️ Edit
+            </button>
+
+            <button
+              class="delete-btn"
+              onclick="deleteProduct('${product.id}')"
+            >
+              🗑️ Delete
+            </button>
+
+          </td>
+
+        </tr>
 
       `;
 
@@ -429,30 +494,43 @@ function renderProducts(){
 
 
 /* =========================================================
-   OPEN PRODUCT FORM
+   NEW PRODUCT
 ========================================================= */
 
-function openProductForm(){
+function openProductForm() {
 
   EDITING_ID = null;
+
   PRODUCT_IMAGES = [];
+
 
   $("formTitle").textContent =
     "নতুন প্রোডাক্ট যোগ করুন";
 
+
   $("pId").value = "";
+
   $("pName").value = "";
+
   $("pCategory").value = "";
+
   $("pPrice").value = "";
+
   $("pOldPrice").value = "";
+
   $("pStock").value = "";
+
   $("pColors").value = "";
+
   $("pSizes").value = "";
+
   $("pDesc").value = "";
 
   $("pImages").value = "";
 
+
   renderImagePreview();
+
 
   $("productModal")
     .classList.add("open");
@@ -461,10 +539,10 @@ function openProductForm(){
 
 
 /* =========================================================
-   CLOSE PRODUCT FORM
+   CLOSE FORM
 ========================================================= */
 
-function closeProductForm(){
+function closeProductForm() {
 
   $("productModal")
     .classList.remove("open");
@@ -476,63 +554,79 @@ function closeProductForm(){
    EDIT PRODUCT
 ========================================================= */
 
-function editProduct(id){
+function editProduct(id) {
 
   const product =
-    PRODUCTS.find(function(item){
+    PRODUCTS.find(function(item) {
 
       return item.id === id;
 
     });
 
-  if(!product){
+
+  if (!product) {
     return;
   }
 
+
   EDITING_ID = id;
+
 
   $("formTitle").textContent =
     "প্রোডাক্ট Edit করুন";
 
+
   $("pId").value =
     product.id || "";
+
 
   $("pName").value =
     product.name || "";
 
+
   $("pCategory").value =
     product.category || "";
+
 
   $("pPrice").value =
     product.price || "";
 
+
   $("pOldPrice").value =
     product.oldPrice || "";
 
+
   $("pStock").value =
     product.stock || "";
+
 
   $("pColors").value =
     Array.isArray(product.colors)
       ? product.colors.join(", ")
       : "";
 
+
   $("pSizes").value =
     Array.isArray(product.sizes)
       ? product.sizes.join(", ")
       : "";
 
+
   $("pDesc").value =
     product.description || "";
+
 
   PRODUCT_IMAGES =
     Array.isArray(product.images)
       ? [...product.images]
       : [];
 
+
   $("pImages").value = "";
 
+
   renderImagePreview();
+
 
   $("productModal")
     .classList.add("open");
@@ -544,28 +638,35 @@ function editProduct(id){
    IMAGE UPLOAD
 ========================================================= */
 
-function handleImageUpload(event){
+function handleImageUpload(event) {
 
   const files =
     Array.from(
       event.target.files || []
     );
 
-  if(!files.length){
+
+  if (!files.length) {
     return;
   }
 
-  files.forEach(function(file){
 
-    if(!file.type.startsWith("image/")){
+  files.forEach(function(file) {
+
+    if (
+      !file.type.startsWith("image/")
+    ) {
       return;
     }
 
+
     compressImage(
       file,
-      function(dataUrl){
+      function(dataUrl) {
 
-        PRODUCT_IMAGES.push(dataUrl);
+        PRODUCT_IMAGES.push(
+          dataUrl
+        );
 
         renderImagePreview();
 
@@ -578,93 +679,113 @@ function handleImageUpload(event){
 
 
 /* =========================================================
-   COMPRESS IMAGE
+   IMAGE COMPRESS
 ========================================================= */
 
-function compressImage(file, callback){
+function compressImage(
+  file,
+  callback
+) {
 
   const reader =
     new FileReader();
 
-  reader.onload = function(event){
 
-    const image =
-      new Image();
+  reader.onload =
+    function(event) {
 
-    image.onload = function(){
+      const image =
+        new Image();
 
-      const MAX_SIZE = 900;
 
-      let width =
-        image.width;
+      image.onload =
+        function() {
 
-      let height =
-        image.height;
+          const MAX_SIZE = 900;
 
-      if(width > height){
+          let width =
+            image.width;
 
-        if(width > MAX_SIZE){
+          let height =
+            image.height;
 
-          height =
-            height *
-            MAX_SIZE /
-            width;
 
-          width =
-            MAX_SIZE;
+          if (width > height) {
 
-        }
+            if (width > MAX_SIZE) {
 
-      }else{
+              height =
+                height *
+                MAX_SIZE /
+                width;
 
-        if(height > MAX_SIZE){
+              width =
+                MAX_SIZE;
 
-          width =
-            width *
-            MAX_SIZE /
-            height;
+            }
 
-          height =
-            MAX_SIZE;
+          } else {
 
-        }
+            if (height > MAX_SIZE) {
 
-      }
+              width =
+                width *
+                MAX_SIZE /
+                height;
 
-      const canvas =
-        document.createElement("canvas");
+              height =
+                MAX_SIZE;
 
-      canvas.width =
-        Math.round(width);
+            }
 
-      canvas.height =
-        Math.round(height);
+          }
 
-      const context =
-        canvas.getContext("2d");
 
-      context.drawImage(
-        image,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
+          const canvas =
+            document.createElement(
+              "canvas"
+            );
 
-      const compressed =
-        canvas.toDataURL(
-          "image/jpeg",
-          0.75
-        );
 
-      callback(compressed);
+          canvas.width =
+            Math.round(width);
+
+          canvas.height =
+            Math.round(height);
+
+
+          const context =
+            canvas.getContext("2d");
+
+
+          context.drawImage(
+            image,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+
+          const compressed =
+            canvas.toDataURL(
+              "image/jpeg",
+              0.75
+            );
+
+
+          callback(
+            compressed
+          );
+
+        };
+
+
+      image.src =
+        event.target.result;
 
     };
 
-    image.src =
-      event.target.result;
-
-  };
 
   reader.readAsDataURL(file);
 
@@ -675,48 +796,51 @@ function compressImage(file, callback){
    IMAGE PREVIEW
 ========================================================= */
 
-function renderImagePreview(){
+function renderImagePreview() {
 
   const container =
     $("imagePreviewRow");
 
-  if(!container){
+
+  if (!container) {
     return;
   }
 
-  if(!PRODUCT_IMAGES.length){
 
-    container.innerHTML =
-      `<small style="color:#777;">
+  if (!PRODUCT_IMAGES.length) {
+
+    container.innerHTML = `
+      <small style="color:#777;">
         কোনো ছবি নির্বাচন করা হয়নি।
-       </small>`;
+      </small>
+    `;
 
     return;
-
   }
+
 
   container.innerHTML =
     PRODUCT_IMAGES.map(
-      function(image,index){
+      function(image, index) {
 
         return `
 
-        <div class="th-wrap">
+          <div class="th-wrap">
 
-          <img
-            src="${image}"
-            alt=""
-          >
+            <img
+              src="${image}"
+              alt=""
+            >
 
-          <button
-            type="button"
-            class="rm"
-            onclick="removeImage(${index})"
-          >
-            ×
-          </button>
+            <button
+              type="button"
+              class="rm"
+              onclick="removeImage(${index})"
+            >
+              ×
+            </button>
 
-        </div>
+          </div>
 
         `;
 
@@ -730,7 +854,7 @@ function renderImagePreview(){
    REMOVE IMAGE
 ========================================================= */
 
-function removeImage(index){
+function removeImage(index) {
 
   PRODUCT_IMAGES.splice(
     index,
@@ -746,57 +870,70 @@ function removeImage(index){
    SAVE PRODUCT
 ========================================================= */
 
-async function saveProduct(){
+async function saveProduct() {
 
   const name =
     $("pName").value.trim();
 
+
   const category =
     $("pCategory").value.trim();
+
 
   const price =
     Number(
       $("pPrice").value
     );
 
-  const oldPriceValue =
+
+  const oldPriceText =
     $("pOldPrice").value.trim();
 
+
   const oldPrice =
-    oldPriceValue
-      ? Number(oldPriceValue)
+    oldPriceText
+      ? Number(oldPriceText)
       : 0;
+
 
   const stock =
     Number(
       $("pStock").value
     );
 
+
   const colors =
     $("pColors")
       .value
       .split(",")
-      .map(function(value){
+      .map(function(value) {
+
         return value.trim();
+
       })
       .filter(Boolean);
+
 
   const sizes =
     $("pSizes")
       .value
       .split(",")
-      .map(function(value){
+      .map(function(value) {
+
         return value.trim();
+
       })
       .filter(Boolean);
 
+
   const description =
-    $("pDesc").value.trim();
+    $("pDesc")
+      .value.trim();
 
 
   /* Validation */
 
-  if(!name){
+  if (!name) {
 
     alert(
       "প্রোডাক্টের নাম দিন।"
@@ -805,16 +942,24 @@ async function saveProduct(){
     return;
   }
 
-  if(!Number.isFinite(price) || price <= 0){
+
+  if (
+    !Number.isFinite(price) ||
+    price <= 0
+  ) {
 
     alert(
-      "সঠিক প্রোডাক্ট মূল্য দিন।"
+      "সঠিক বর্তমান মূল্য দিন।"
     );
 
     return;
   }
 
-  if(!Number.isFinite(stock) || stock < 0){
+
+  if (
+    !Number.isFinite(stock) ||
+    stock < 0
+  ) {
 
     alert(
       "সঠিক Stock সংখ্যা দিন।"
@@ -823,38 +968,40 @@ async function saveProduct(){
     return;
   }
 
-  if(oldPrice && oldPrice <= price){
+
+  if (
+    oldPrice &&
+    oldPrice <= price
+  ) {
 
     alert(
-      "আগের মূল্য বর্তমান মূল্যের চেয়ে বেশি হওয়া উচিত।"
+      "আগের মূল্য বর্তমান মূল্যের চেয়ে বেশি দিন।"
     );
 
     return;
   }
 
 
-  /* Product Data */
-
   const productData = {
 
-    name:name,
+    name: name,
 
     category:
       category.toLowerCase(),
 
-    price:price,
+    price: price,
 
-    oldPrice:oldPrice,
+    oldPrice: oldPrice,
 
-    stock:stock,
+    stock: stock,
 
-    colors:colors,
+    colors: colors,
 
-    sizes:sizes,
+    sizes: sizes,
 
-    description:description,
+    description: description,
 
-    images:[
+    images: [
       ...PRODUCT_IMAGES
     ],
 
@@ -866,11 +1013,11 @@ async function saveProduct(){
   };
 
 
-  try{
+  try {
 
     /* EDIT */
 
-    if(EDITING_ID){
+    if (EDITING_ID) {
 
       await db
         .collection("products")
@@ -879,16 +1026,23 @@ async function saveProduct(){
           productData
         );
 
+
+      alert(
+        "✅ প্রোডাক্ট সফলভাবে Update হয়েছে।"
+      );
+
+
     }
 
     /* NEW PRODUCT */
 
-    else{
+    else {
 
       productData.createdAt =
         firebase.firestore
           .FieldValue
           .serverTimestamp();
+
 
       await db
         .collection("products")
@@ -896,14 +1050,12 @@ async function saveProduct(){
           productData
         );
 
+
+      alert(
+        "✅ নতুন প্রোডাক্ট সফলভাবে যোগ হয়েছে।"
+      );
+
     }
-
-
-    alert(
-      EDITING_ID
-        ? "প্রোডাক্ট সফলভাবে Update হয়েছে।"
-        : "প্রোডাক্ট সফলভাবে যোগ হয়েছে।"
-    );
 
 
     closeProductForm();
@@ -911,15 +1063,16 @@ async function saveProduct(){
     await loadProducts();
 
 
-  }catch(error){
+  } catch (error) {
 
     console.error(
       "Save product error:",
       error
     );
 
+
     alert(
-      "প্রোডাক্ট সংরক্ষণ করা যায়নি। Firebase Rules পরীক্ষা করুন।"
+      "❌ প্রোডাক্ট সংরক্ষণ করা যায়নি। Firebase Rules পরীক্ষা করুন।"
     );
 
   }
@@ -931,49 +1084,59 @@ async function saveProduct(){
    DELETE PRODUCT
 ========================================================= */
 
-async function deleteProduct(id){
+async function deleteProduct(id) {
 
   const product =
-    PRODUCTS.find(function(item){
+    PRODUCTS.find(function(item) {
 
       return item.id === id;
 
     });
 
-  if(!product){
+
+  if (!product) {
     return;
   }
+
 
   const confirmed =
     confirm(
-      "আপনি কি সত্যিই এই প্রোডাক্টটি Delete করতে চান?\n\n" +
+      "আপনি কি এই প্রোডাক্টটি Delete করতে চান?\n\n" +
       product.name
     );
 
-  if(!confirmed){
+
+  if (!confirmed) {
     return;
   }
 
-  try{
+
+  try {
 
     await db
       .collection("products")
       .doc(id)
       .delete();
 
+
     alert(
-      "প্রোডাক্ট Delete হয়েছে।"
+      "✅ প্রোডাক্ট Delete হয়েছে।"
     );
+
 
     await loadProducts();
 
 
-  }catch(error){
+  } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Delete error:",
+      error
+    );
+
 
     alert(
-      "প্রোডাক্ট Delete করা যায়নি।"
+      "❌ প্রোডাক্ট Delete করা যায়নি।"
     );
 
   }
@@ -985,14 +1148,16 @@ async function deleteProduct(id){
    LOAD ORDERS
 ========================================================= */
 
-async function loadOrders(){
+async function loadOrders() {
 
   const body =
     $("ordersTableBody");
 
-  if(!body){
+
+  if (!body) {
     return;
   }
+
 
   body.innerHTML = `
     <tr>
@@ -1005,54 +1170,57 @@ async function loadOrders(){
   `;
 
 
-  try{
+  try {
 
     const snapshot =
       await db
         .collection("orders")
-        .orderBy("createdAt","desc")
+        .orderBy("createdAt", "desc")
         .get();
 
+
     ORDERS =
-      snapshot.docs.map(function(doc){
+      snapshot.docs.map(function(doc) {
 
         return {
-          id:doc.id,
+          id: doc.id,
           ...doc.data()
         };
 
       });
 
+
     renderOrders();
 
 
-  }catch(error){
+  } catch (error) {
 
     console.error(
-      "Orders load error:",
+      "Order load error:",
       error
     );
 
 
-    try{
+    try {
 
       const snapshot =
         await db
           .collection("orders")
           .get();
 
+
       ORDERS =
-        snapshot.docs.map(function(doc){
+        snapshot.docs.map(function(doc) {
 
           return {
-            id:doc.id,
+            id: doc.id,
             ...doc.data()
           };
 
         });
 
 
-      ORDERS.sort(function(a,b){
+      ORDERS.sort(function(a, b) {
 
         return getTimestamp(b.createdAt) -
                getTimestamp(a.createdAt);
@@ -1062,9 +1230,13 @@ async function loadOrders(){
 
       renderOrders();
 
-    }catch(secondError){
 
-      console.error(secondError);
+    } catch (secondError) {
+
+      console.error(
+        secondError
+      );
+
 
       body.innerHTML = `
         <tr>
@@ -1087,16 +1259,18 @@ async function loadOrders(){
    RENDER ORDERS
 ========================================================= */
 
-function renderOrders(){
+function renderOrders() {
 
   const body =
     $("ordersTableBody");
 
-  if(!body){
+
+  if (!body) {
     return;
   }
 
-  if(!ORDERS.length){
+
+  if (!ORDERS.length) {
 
     body.innerHTML = `
       <tr>
@@ -1113,114 +1287,132 @@ function renderOrders(){
 
 
   body.innerHTML =
-    ORDERS.map(function(order){
+    ORDERS.map(function(order) {
 
       const date =
         formatDate(
           order.createdAt
         );
 
-      const status =
-        order.status || "নতুন";
 
-      const done =
+      const status =
+        order.status ||
+        "নতুন";
+
+
+      const isDone =
         status === "সম্পন্ন";
 
 
       return `
 
-      <tr>
+        <tr>
 
-        <td>
-          ${date}
-        </td>
+          <td>
+            ${date}
+          </td>
 
-        <td>
 
-          <strong>
+          <td>
+
+            <strong>
+              ${escapeHtml(
+                order.productName
+              )}
+            </strong>
+
+            <br>
+
+            <small>
+              কালার:
+              ${escapeHtml(
+                order.color || "—"
+              )}
+
+              <br>
+
+              সাইজ:
+              ${escapeHtml(
+                order.size || "—"
+              )}
+            </small>
+
+          </td>
+
+
+          <td>
             ${escapeHtml(
-              order.productName
+              order.customerName
             )}
-          </strong>
+          </td>
 
-          <br>
 
-          <small>
+          <td>
+
+            <a
+              href="tel:${escapeHtml(
+                order.customerPhone
+              )}"
+            >
+              ${escapeHtml(
+                order.customerPhone
+              )}
+            </a>
+
+          </td>
+
+
+          <td>
             ${escapeHtml(
-              order.color || "—"
+              order.customerAddress
             )}
-            /
-            ${escapeHtml(
-              order.size || "—"
+          </td>
+
+
+          <td>
+            ${Number(
+              order.qty || 0
             )}
-          </small>
+          </td>
 
-        </td>
 
-        <td>
-          ${escapeHtml(
-            order.customerName
-          )}
-        </td>
+          <td>
 
-        <td>
+            <span
+              class="status-pill ${
+                isDone ? "done" : ""
+              }"
+            >
+              ${escapeHtml(status)}
+            </span>
 
-          <a
-            href="tel:${escapeHtml(order.customerPhone)}"
-          >
-            ${escapeHtml(
-              order.customerPhone
-            )}
-          </a>
+            <br>
 
-        </td>
+            <button
+              style="
+                margin-top:6px;
+                border:1px solid #ddd;
+                background:#fff;
+                border-radius:6px;
+                padding:5px 8px;
+                font-family:inherit;
+                font-size:11px;
+              "
+              onclick="toggleOrderStatus(
+                '${order.id}',
+                '${isDone ? "নতুন" : "সম্পন্ন"}'
+              )"
+            >
+              ${
+                isDone
+                  ? "↩ নতুন করুন"
+                  : "✓ সম্পন্ন করুন"
+              }
+            </button>
 
-        <td>
-          ${escapeHtml(
-            order.customerAddress
-          )}
-        </td>
+          </td>
 
-        <td>
-          ${Number(order.qty || 0)}
-        </td>
-
-        <td>
-
-          <span
-            class="status-pill ${
-              done ? "done" : ""
-            }"
-          >
-            ${escapeHtml(status)}
-          </span>
-
-          <br>
-
-          <button
-            style="
-              margin-top:6px;
-              border:1px solid #ddd;
-              background:#fff;
-              border-radius:6px;
-              padding:4px 7px;
-              font-size:11px;
-            "
-            onclick="toggleOrderStatus(
-              '${order.id}',
-              '${done ? "নতুন" : "সম্পন্ন"}'
-            )"
-          >
-            ${
-              done
-                ? "নতুন করুন"
-                : "সম্পন্ন করুন"
-            }
-          </button>
-
-        </td>
-
-      </tr>
+        </tr>
 
       `;
 
@@ -1230,22 +1422,23 @@ function renderOrders(){
 
 
 /* =========================================================
-   ORDER STATUS
+   CHANGE ORDER STATUS
 ========================================================= */
 
 async function toggleOrderStatus(
   orderId,
   newStatus
-){
+) {
 
-  try{
+  try {
 
     await db
       .collection("orders")
       .doc(orderId)
       .update({
 
-        status:newStatus,
+        status:
+          newStatus,
 
         updatedAt:
           firebase.firestore
@@ -1254,12 +1447,17 @@ async function toggleOrderStatus(
 
       });
 
+
     await loadOrders();
 
 
-  }catch(error){
+  } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Order status error:",
+      error
+    );
+
 
     alert(
       "Order status পরিবর্তন করা যায়নি।"
@@ -1271,56 +1469,62 @@ async function toggleOrderStatus(
 
 
 /* =========================================================
-   DATE HELPERS
+   DATE
 ========================================================= */
 
-function getTimestamp(value){
+function getTimestamp(value) {
 
-  if(!value){
+  if (!value) {
     return 0;
   }
 
-  if(
+
+  if (
     typeof value.toMillis ===
     "function"
-  ){
+  ) {
 
     return value.toMillis();
 
   }
 
-  if(value.seconds){
+
+  if (value.seconds) {
 
     return value.seconds * 1000;
 
   }
 
+
   const date =
     new Date(value);
+
 
   return date.getTime() || 0;
 
 }
 
 
-function formatDate(value){
+function formatDate(value) {
 
   const timestamp =
     getTimestamp(value);
 
-  if(!timestamp){
+
+  if (!timestamp) {
     return "—";
   }
+
 
   return new Date(timestamp)
     .toLocaleString(
       "bn-BD",
       {
-        year:"numeric",
-        month:"short",
-        day:"numeric",
-        hour:"numeric",
-        minute:"2-digit"
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
       }
     );
 
@@ -1328,20 +1532,20 @@ function formatDate(value){
 
 
 /* =========================================================
-   MODAL CLOSE
+   CLOSE MODAL BY CLICKING OUTSIDE
 ========================================================= */
 
-if($("productModal")){
+if ($("productModal")) {
 
   $("productModal")
     .addEventListener(
       "click",
-      function(event){
+      function(event) {
 
-        if(
+        if (
           event.target.id ===
           "productModal"
-        ){
+        ) {
 
           closeProductForm();
 
@@ -1354,14 +1558,16 @@ if($("productModal")){
 
 
 /* =========================================================
-   ESCAPE KEY
+   ESC KEY
 ========================================================= */
 
 document.addEventListener(
   "keydown",
-  function(event){
+  function(event) {
 
-    if(event.key === "Escape"){
+    if (
+      event.key === "Escape"
+    ) {
 
       closeProductForm();
 
