@@ -1,191 +1,1167 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Eyakub Shop — অরিজিনাল জুতার কালেকশন</title>
+
+<meta name="description" content="Eyakub Shop — অরিজিনাল জুতা, সারা দেশে ডেলিভারি এবং সহজ অর্ডার সুবিধা।">
+<meta name="theme-color" content="#071a26">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👟</text></svg>">
+
+<link rel="icon" href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<text y='.9em' font-size='90'>👟</text>
+</svg>">
 </head>
+
 <body>
 
-<header class="site-header">
-  <div class="container header-row">
-    <div class="logo"><span class="logo-icon">🛍️</span><span class="logo-text">Eyakub Shop</span></div>
-    <form class="search-box" onsubmit="return doSearch(event)">
-      <input id="searchInput" type="text" placeholder="জুতা খুঁজুন...">
-      <button type="submit">🔍</button>
-    </form>
-    <div class="header-actions">
-      <a href="admin.html">👤 Admin</a>
-      <a href="__FB_LINK__" target="_blank">📘 Facebook</a>
-      <a class="whatsapp-pill" id="waHeaderBtn" target="_blank">💬 অর্ডার করুন</a>
-    </div>
+<!-- ================= TOP NOTICE ================= -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <span>
+      🚚 সারা বাংলাদেশে ডেলিভারি &nbsp; • &nbsp;
+      💳 ক্যাশ অন ডেলিভারি &nbsp; • &nbsp;
+      💬 WhatsApp-এ সহজ অর্ডার
+    </span>
+
+    <a
+      href="https://www.facebook.com/profile.php?id=61594226919156"
+      target="_blank"
+      rel="noopener">
+      Facebook Page
+    </a>
   </div>
-  <nav class="main-nav">
-    <div class="container">
-      <ul id="navCategoryList">
-        <li><a href="#home" class="home-link">🏠 হোম</a></li>
-        <li><a href="#products">🛍️ সব প্রোডাক্ট</a></li>
-        <li><a href="#about">ℹ️ আমাদের সম্পর্কে</a></li>
-        <li><a href="#contact">📞 যোগাযোগ</a></li>
-      </ul>
+</div>
+
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+
+  <div class="container header-main">
+
+    <button
+      class="mobile-menu-btn"
+      type="button"
+      onclick="toggleMobileMenu()"
+      aria-label="Menu">
+      ☰
+    </button>
+
+    <a href="#home" class="logo">
+      <span class="logo-cart">🛒</span>
+      <span>Eyakub <b>Shop</b></span>
+    </a>
+
+
+    <!-- SEARCH -->
+    <form
+      class="search-box"
+      onsubmit="return doSearch(event)">
+
+      <input
+        id="searchInput"
+        type="search"
+        autocomplete="off"
+        placeholder="জুতা, ব্র্যান্ড বা প্রোডাক্ট খুঁজুন...">
+
+      <button type="submit">
+        🔍
+      </button>
+    </form>
+
+
+    <!-- HEADER ACTIONS -->
+    <div class="header-actions">
+
+      <a
+        href="https://www.facebook.com/profile.php?id=61594226919156"
+        target="_blank"
+        rel="noopener"
+        class="head-action">
+        📘
+        <span>Facebook</span>
+      </a>
+
+      <a
+        id="waHeaderBtn"
+        class="head-action whatsapp-head"
+        target="_blank"
+        rel="noopener">
+        💬
+        <span>অর্ডার</span>
+      </a>
+
+      <button
+        class="cart-head"
+        type="button"
+        onclick="openCart && openCart()">
+        🛒
+        <span>Cart</span>
+        <b id="cartCount">0</b>
+      </button>
+
     </div>
+
+  </div>
+
+
+  <!-- ================= CATEGORY NAV ================= -->
+  <nav class="main-nav" id="mainNav">
+
+    <div class="container nav-scroll">
+
+      <a href="#home" class="nav-item active">
+        🏠 <span>হোম</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item"
+        onclick="filterCategory && filterCategory('স্নিকার্স')">
+        👟 <span>ছেলেদের জুতা</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item"
+        onclick="filterCategory && filterCategory('ফরমাল')">
+        👞 <span>ফরমাল শু</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item"
+        onclick="filterCategory && filterCategory('স্যান্ডেল')">
+        🩴 <span>স্যান্ডেল</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item"
+        onclick="filterCategory && filterCategory('স্পোর্টস')">
+        🏃 <span>স্পোর্টস</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item"
+        onclick="filterCategory && filterCategory('লেদার')">
+        👢 <span>লেদার</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item">
+        🆕 <span>নতুন কালেকশন</span>
+      </a>
+
+      <a
+        href="#products"
+        class="nav-item">
+        🔥 <span>অফার</span>
+      </a>
+
+      <a
+        href="#contact"
+        class="nav-item">
+        📞 <span>যোগাযোগ</span>
+      </a>
+
+    </div>
+
   </nav>
+
 </header>
 
-<div class="container" id="home">
 
-  <div class="cat-icon-strip" id="catIconStrip"></div>
+<main id="home">
 
-  <div class="hero">
+
+<!-- ================= HERO ================= -->
+<section class="container hero-section">
+
+  <div class="hero-main">
+
+    <div class="hero-content">
+
+      <span class="offer-badge">
+        🔥 SPECIAL OFFER
+      </span>
+
+      <h1>
+        স্টাইলিশ জুতা<br>
+        <strong>সেরা দামে!</strong>
+      </h1>
+
+      <p>
+        আপনার স্টাইল, আমাদের অঙ্গীকার।
+        অরিজিনাল ও মানসম্মত জুতার বিশাল কালেকশন।
+      </p>
+
+      <div class="hero-buttons">
+
+        <a href="#products" class="hero-btn">
+          শপ করুন →
+        </a>
+
+        <a
+          id="heroWhatsApp"
+          target="_blank"
+          rel="noopener"
+          class="hero-wa-btn">
+          💬 WhatsApp অর্ডার
+        </a>
+
+      </div>
+
+      <div class="hero-features">
+        <span>✓ অরিজিনাল প্রোডাক্ট</span>
+        <span>✓ সারা দেশে ডেলিভারি</span>
+        <span>✓ ক্যাশ অন ডেলিভারি</span>
+      </div>
+
+    </div>
+
+
+    <div class="hero-shoes">
+
+      <div class="hero-circle"></div>
+
+      <div class="shoe-emoji shoe-one">👟</div>
+      <div class="shoe-emoji shoe-two">👟</div>
+
+      <span class="discount-circle">
+        UP TO<br>
+        <b>50%</b><br>
+        OFF
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= QUICK CATEGORIES ================= -->
+<section class="container">
+
+  <div class="quick-categories">
+
+    <button onclick="filterCategory && filterCategory('স্নিকার্স')">
+      <span>👟</span>
+      <b>ছেলেদের জুতা</b>
+      <small>দেখুন →</small>
+    </button>
+
+    <button onclick="filterCategory && filterCategory('ফরমাল')">
+      <span>👞</span>
+      <b>ফরমাল শু</b>
+      <small>দেখুন →</small>
+    </button>
+
+    <button onclick="filterCategory && filterCategory('স্পোর্টস')">
+      <span>🏃</span>
+      <b>স্পোর্টস শু</b>
+      <small>দেখুন →</small>
+    </button>
+
+    <button onclick="filterCategory && filterCategory('স্যান্ডেল')">
+      <span>🩴</span>
+      <b>স্যান্ডেল</b>
+      <small>দেখুন →</small>
+    </button>
+
+    <button onclick="filterCategory && filterCategory('লেদার')">
+      <span>👢</span>
+      <b>লেদার শু</b>
+      <small>দেখুন →</small>
+    </button>
+
+    <button onclick="showAllProducts && showAllProducts()">
+      <span>▦</span>
+      <b>সব প্রোডাক্ট</b>
+      <small>দেখুন →</small>
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- ================= TRUST BAR ================= -->
+<section class="container trust-section">
+
+  <div class="trust-grid">
+
+    <div class="trust-item">
+      <div class="trust-icon">🚚</div>
+      <div>
+        <strong>সারা দেশে ডেলিভারি</strong>
+        <small>দ্রুত ও নিরাপদ</small>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">🛡️</div>
+      <div>
+        <strong>নিরাপদ পেমেন্ট</strong>
+        <small>ক্যাশ অন ডেলিভারি</small>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">🔄</div>
+      <div>
+        <strong>সহজ রিটার্ন</strong>
+        <small>প্রযোজ্য ক্ষেত্রে</small>
+      </div>
+    </div>
+
+    <div class="trust-item">
+      <div class="trust-icon">💬</div>
+      <div>
+        <strong>WhatsApp সাপোর্ট</strong>
+        <small>সরাসরি যোগাযোগ</small>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= FLASH SALE ================= -->
+<section class="container section-block">
+
+  <div class="section-head">
+
     <div>
-      <span class="hero-tag">Fashion</span>
-      <h1 id="shopTagline">অরিজিনাল জুতার সেরা কালেকশন</h1>
-      <p>১০০% অরিজিনাল প্রোডাক্ট, সারা দেশে ডেলিভারি, ক্যাশ অন ডেলিভারি সুবিধা</p>
-      <a href="#products" class="btn-cta">শপ করুন</a>
+      <span class="section-kicker">🔥 LIMITED TIME</span>
+      <h2>Flash Sale</h2>
     </div>
-  </div>
 
-  <div class="service-strip">
-    <div class="service-item"><span class="ic">🚚</span><div><strong>সারা দেশে ডেলিভারি</strong><span>দ্রুত ও নিরাপদ</span></div></div>
-    <div class="service-item"><span class="ic">🛡️</span><div><strong>নিরাপদ পেমেন্ট</strong><span>ক্যাশ অন ডেলিভারি</span></div></div>
-    <div class="service-item"><span class="ic">🔄</span><div><strong>১০০% অরিজিনাল</strong><span>মানসম্পন্ন পণ্য</span></div></div>
-    <div class="service-item"><span class="ic">🎧</span><div><strong>সাপোর্ট</strong><span>WhatsApp-এ যোগাযোগ করুন</span></div></div>
-  </div>
-
-  <div class="section-head" id="flashHead" style="display:none;">
-    <h2>⚡ ফ্ল্যাশ সেল</h2>
-    <div class="countdown" id="countdownBox">
-      শেষ হতে বাকি:
-      <span class="box" id="cdH">00</span>:<span class="box" id="cdM">00</span>:<span class="box" id="cdS">00</span>
+    <div class="flash-timer">
+      <span>অফার চলছে</span>
+      <b>আজকের বিশেষ দাম</b>
     </div>
-  </div>
-  <div class="product-grid" id="flashGrid"></div>
 
-  <div class="section-head" id="products">
-    <h2>🔥 জনপ্রিয় প্রোডাক্ট</h2>
-    <span class="see-all" id="productCount"></span>
-  </div>
-  <div class="product-grid" id="productGrid">
-    <p class="empty-note">প্রোডাক্ট লোড হচ্ছে...</p>
+    <a href="#products" class="see-all">
+      সব দেখুন →
+    </a>
+
   </div>
 
-  <div class="promo-grid">
-    <div class="promo-card a">
-      <h3>নতুন কালেকশন</h3>
-      <p>সব সময় নতুন ও ট্রেন্ডি ডিজাইন যুক্ত হচ্ছে আমাদের কালেকশনে</p>
-      <a href="#products" class="btn-cta">দেখুন</a>
+  <div
+    class="product-grid flash-grid"
+    id="flashGrid">
+
+    <p class="empty-note">
+      প্রোডাক্ট লোড হচ্ছে...
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- ================= COLLECTION BANNERS ================= -->
+<section class="container collection-section">
+
+  <div class="collection-banner men-banner">
+
+    <div class="collection-text">
+
+      <span>MEN'S COLLECTION</span>
+
+      <h2>
+        ছেলেদের জুতা
+      </h2>
+
+      <p>
+        স্টাইল + কমফোর্ট = পারফেক্ট লুক
+      </p>
+
+      <a
+        href="#products"
+        class="collection-btn"
+        onclick="filterCategory && filterCategory('স্নিকার্স')">
+        Shop Now →
+      </a>
+
     </div>
-    <div class="promo-card b">
-      <h3>স্পেশাল অফার</h3>
-      <p>নির্বাচিত প্রোডাক্টে চলছে বিশেষ ছাড় — এখনই অর্ডার করুন</p>
-      <a href="#products" class="btn-cta">অফার দেখুন</a>
-    </div>
-  </div>
-</div>
 
-<!-- ============== Product Modal ============== -->
-<div class="modal-overlay" id="modalOverlay">
+    <div class="collection-icon">
+      👟
+    </div>
+
+  </div>
+
+
+  <div class="collection-banner ladies-banner">
+
+    <div class="collection-text">
+
+      <span>LATEST COLLECTION</span>
+
+      <h2>
+        নতুন কালেকশন
+      </h2>
+
+      <p>
+        আপনার প্রতিদিনের স্টাইলের জন্য
+      </p>
+
+      <a
+        href="#products"
+        class="collection-btn"
+        onclick="showAllProducts && showAllProducts()">
+        Shop Now →
+      </a>
+
+    </div>
+
+    <div class="collection-icon">
+      ✨
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ALL PRODUCTS ================= -->
+<section class="container section-block" id="products">
+
+  <div class="section-head">
+
+    <div>
+      <span class="section-kicker">🛍️ OUR COLLECTION</span>
+      <h2>জনপ্রিয় প্রোডাক্ট</h2>
+    </div>
+
+    <span id="productCount" class="product-count"></span>
+
+  </div>
+
+
+  <!-- CATEGORY FILTER -->
+  <div class="filter-row">
+
+    <button
+      class="filter-btn active"
+      onclick="showAllProducts && showAllProducts()">
+      সব
+    </button>
+
+    <button
+      class="filter-btn"
+      onclick="filterCategory && filterCategory('স্নিকার্স')">
+      👟 স্নিকার্স
+    </button>
+
+    <button
+      class="filter-btn"
+      onclick="filterCategory && filterCategory('স্পোর্টস')">
+      🏃 স্পোর্টস
+    </button>
+
+    <button
+      class="filter-btn"
+      onclick="filterCategory && filterCategory('ফরমাল')">
+      👞 ফরমাল
+    </button>
+
+    <button
+      class="filter-btn"
+      onclick="filterCategory && filterCategory('স্যান্ডেল')">
+      🩴 স্যান্ডেল
+    </button>
+
+    <button
+      class="filter-btn"
+      onclick="filterCategory && filterCategory('লেদার')">
+      👢 লেদার
+    </button>
+
+  </div>
+
+
+  <div
+    class="product-grid"
+    id="productGrid">
+
+    <div class="loading-card">
+      <div class="loading-spinner"></div>
+      <p>প্রোডাক্ট লোড হচ্ছে...</p>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= BENEFITS ================= -->
+<section class="container benefits-section">
+
+  <div class="benefit-card">
+    <span>💯</span>
+    <h3>অরিজিনাল প্রোডাক্ট</h3>
+    <p>মানসম্মত ও যাচাইকৃত পণ্য</p>
+  </div>
+
+  <div class="benefit-card">
+    <span>🚚</span>
+    <h3>সারা দেশে ডেলিভারি</h3>
+    <p>আপনার ঠিকানায় পৌঁছে দেব</p>
+  </div>
+
+  <div class="benefit-card">
+    <span>💳</span>
+    <h3>ক্যাশ অন ডেলিভারি</h3>
+    <p>পণ্য হাতে পেয়ে পেমেন্ট</p>
+  </div>
+
+  <div class="benefit-card">
+    <span>💬</span>
+    <h3>WhatsApp অর্ডার</h3>
+    <p>সহজে সরাসরি অর্ডার করুন</p>
+  </div>
+
+</section>
+
+
+<!-- ================= RELATED PRODUCTS ================= -->
+<section class="container section-block related-section">
+
+  <div class="section-head">
+
+    <div>
+      <span class="section-kicker">✨ YOU MAY ALSO LIKE</span>
+      <h2>আরও প্রোডাক্ট দেখুন</h2>
+    </div>
+
+    <a href="#products" class="see-all">
+      সব দেখুন →
+    </a>
+
+  </div>
+
+  <div
+    class="product-grid"
+    id="relatedGrid">
+
+  </div>
+
+</section>
+
+
+<!-- ================= ABOUT ================= -->
+<section
+  class="container about-section"
+  id="about">
+
+  <div class="about-content">
+
+    <span class="section-kicker">
+      ABOUT EYAKUB SHOP
+    </span>
+
+    <h2>
+      আপনার স্টাইলের জন্য<br>
+      <strong>সঠিক জুতা</strong>
+    </h2>
+
+    <p>
+      Eyakub Shop-এ আমরা মানসম্মত ও স্টাইলিশ জুতা
+      সহজে আপনার কাছে পৌঁছে দিতে কাজ করি।
+      আমাদের লক্ষ্য হলো ভালো পণ্য, ন্যায্য মূল্য
+      এবং সহজ অর্ডার অভিজ্ঞতা দেওয়া।
+    </p>
+
+    <div class="about-points">
+      <span>✓ মানসম্মত পণ্য</span>
+      <span>✓ সাশ্রয়ী মূল্য</span>
+      <span>✓ দ্রুত ডেলিভারি</span>
+      <span>✓ WhatsApp সাপোর্ট</span>
+    </div>
+
+  </div>
+
+  <div class="about-card">
+
+    <div class="about-logo">
+      🛒
+    </div>
+
+    <h3>Eyakub Shop</h3>
+
+    <p>
+      Better Products<br>
+      Better Life
+    </p>
+
+    <a
+      href="https://www.facebook.com/profile.php?id=61594226919156"
+      target="_blank"
+      rel="noopener">
+      📘 Facebook Page →
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- ================= CONTACT CTA ================= -->
+<section class="container contact-cta" id="contact">
+
+  <div>
+
+    <span>💬 READY TO ORDER?</span>
+
+    <h2>
+      পছন্দের জুতা অর্ডার করুন
+    </h2>
+
+    <p>
+      প্রোডাক্ট নির্বাচন করুন অথবা সরাসরি WhatsApp-এ যোগাযোগ করুন।
+    </p>
+
+  </div>
+
+  <a
+    id="waPromoBtn"
+    target="_blank"
+    rel="noopener"
+    class="contact-wa">
+    💬 WhatsApp-এ অর্ডার করুন
+  </a>
+
+</section>
+
+</main>
+
+
+<!-- ================= PRODUCT MODAL ================= -->
+<div
+  class="modal-overlay"
+  id="modalOverlay">
+
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <button
+      class="modal-close"
+      onclick="closeModal()"
+      type="button">
+      ✕
+    </button>
+
     <div class="modal-grid">
+
+      <!-- PRODUCT IMAGES -->
       <div class="modal-gallery">
-        <img id="modalMainImg" src="" alt="">
-        <div class="modal-thumbs" id="modalThumbs"></div>
+
+        <div class="modal-image-wrap">
+
+          <span
+            class="modal-offer"
+            id="modalDiscount">
+          </span>
+
+          <img
+            id="modalMainImg"
+            src=""
+            alt="Product"
+            loading="lazy">
+
+        </div>
+
+        <div
+          class="modal-thumbs"
+          id="modalThumbs">
+        </div>
+
       </div>
+
+
+      <!-- PRODUCT INFO -->
       <div class="modal-info">
+
+        <span
+          class="modal-category"
+          id="modalCategory">
+        </span>
+
         <h2 id="modalName"></h2>
+
+        <div class="rating-row">
+          ⭐ <span id="modalRating">4.8</span>
+          <span>•</span>
+          <span>জনপ্রিয় প্রোডাক্ট</span>
+        </div>
+
+
         <div class="modal-price">
-          <span class="now" id="modalPrice"></span>
-          <span class="old" id="modalOldPrice"></span>
-        </div>
-        <div class="stock-line" id="modalStock"></div>
 
-        <div class="opt-group" id="colorGroup">
-          <label>কালার বাছাই করুন</label>
-          <div class="opt-pills" id="colorPills"></div>
+          <span
+            class="now"
+            id="modalPrice">
+          </span>
+
+          <span
+            class="old"
+            id="modalOldPrice">
+          </span>
+
         </div>
-        <div class="opt-group" id="sizeGroup">
-          <label>সাইজ বাছাই করুন</label>
-          <div class="opt-pills" id="sizePills"></div>
+
+
+        <div
+          class="stock-line"
+          id="modalStock">
         </div>
-        <div class="opt-group">
-          <label>পরিমাণ</label>
-          <div class="qty-row">
-            <button type="button" onclick="changeQty(-1)">−</button>
-            <span id="qtyVal">1</span>
-            <button type="button" onclick="changeQty(1)">+</button>
+
+
+        <!-- COLOR -->
+        <div
+          class="opt-group"
+          id="colorGroup">
+
+          <label>
+            🎨 কালার বাছাই করুন
+          </label>
+
+          <div
+            class="opt-pills"
+            id="colorPills">
           </div>
+
         </div>
 
-        <p class="desc-text" id="modalDesc"></p>
 
+        <!-- SIZE -->
+        <div
+          class="opt-group"
+          id="sizeGroup">
+
+          <label>
+            📏 সাইজ বাছাই করুন
+          </label>
+
+          <div
+            class="opt-pills"
+            id="sizePills">
+          </div>
+
+        </div>
+
+
+        <!-- QUANTITY -->
+        <div class="opt-group">
+
+          <label>
+            পরিমাণ
+          </label>
+
+          <div class="qty-row">
+
+            <button
+              type="button"
+              onclick="changeQty(-1)">
+              −
+            </button>
+
+            <span id="qtyVal">
+              1
+            </span>
+
+            <button
+              type="button"
+              onclick="changeQty(1)">
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+        <div
+          class="desc-text"
+          id="modalDesc">
+        </div>
+
+
+        <!-- ORDER FORM -->
         <div class="order-form">
-          <h3>অর্ডার করতে আপনার তথ্য দিন</h3>
-          <input type="text" id="custName" placeholder="আপনার পুরো নাম *">
-          <input type="tel" id="custPhone" placeholder="ফোন নাম্বার (WhatsApp/Bkash) *">
-          <textarea id="custAddress" rows="2" placeholder="সম্পূর্ণ ঠিকানা (জেলা, থানা, এলাকা) *"></textarea>
-          <input type="text" id="custNote" placeholder="অতিরিক্ত কোনো নোট (ঐচ্ছিক)">
-          <button class="btn-order" onclick="submitOrder()">💬 WhatsApp-এ অর্ডার পাঠান</button>
+
+          <h3>
+            📝 অর্ডার করতে তথ্য দিন
+          </h3>
+
+          <p class="form-note">
+            আপনার তথ্য শুধুমাত্র অর্ডার কনফার্ম করার জন্য ব্যবহার করা হবে।
+          </p>
+
+          <input
+            type="text"
+            id="custName"
+            placeholder="আপনার পুরো নাম *"
+            autocomplete="name">
+
+          <input
+            type="tel"
+            id="custPhone"
+            placeholder="মোবাইল নাম্বার *"
+            autocomplete="tel">
+
+          <textarea
+            id="custAddress"
+            rows="3"
+            placeholder="সম্পূর্ণ ঠিকানা — জেলা, থানা, এলাকা *"
+            autocomplete="street-address"></textarea>
+
+          <input
+            type="text"
+            id="custNote"
+            placeholder="অতিরিক্ত কোনো নোট (ঐচ্ছিক)">
+
+          <button
+            class="btn-order"
+            type="button"
+            onclick="submitOrder()">
+            💬 WhatsApp-এ অর্ডার পাঠান
+          </button>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
 
-<div class="section-head container" style="margin-top:10px;">
-  <h2>🛍️ আরও প্রোডাক্ট দেখুন</h2>
-</div>
-<div class="container product-grid" id="relatedGrid" style="margin-bottom:40px;"></div>
 
-<footer id="contact">
-  <div class="container footer-grid">
-    <div>
-      <h4>Eyakub Shop</h4>
-      <p style="font-size:13.5px;">আমরা বিক্রি করি ১০০% অরিজিনাল ও কোয়ালিটিসম্পন্ন জুতা। সন্তুষ্টিই আমাদের লক্ষ্য।</p>
-      <div class="footer-social">
-        <a href="__FB_LINK__" target="_blank">📘</a>
-        <a id="footerWaLink" target="_blank">💬</a>
-      </div>
+<!-- ================= CART PANEL ================= -->
+<div
+  class="cart-overlay"
+  id="cartOverlay"
+  onclick="closeCart && closeCart()">
+
+  <div
+    class="cart-panel"
+    onclick="event.stopPropagation()">
+
+    <div class="cart-header">
+
+      <h2>
+        🛒 আপনার Cart
+      </h2>
+
+      <button
+        type="button"
+        onclick="closeCart && closeCart()">
+        ✕
+      </button>
+
     </div>
+
+    <div
+      id="cartItems"
+      class="cart-items">
+
+      <p>
+        আপনার Cart খালি।
+      </p>
+
+    </div>
+
+    <div class="cart-footer">
+
+      <div>
+        <span>মোট:</span>
+        <strong id="cartTotal">৳0</strong>
+      </div>
+
+      <a
+        id="cartWhatsApp"
+        target="_blank"
+        rel="noopener"
+        class="btn-order">
+        💬 WhatsApp-এ অর্ডার করুন
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= FOOTER ================= -->
+<footer>
+
+  <div class="container footer-grid">
+
+    <div class="footer-brand">
+
+      <a href="#home" class="footer-logo">
+        🛒 Eyakub <b>Shop</b>
+      </a>
+
+      <p>
+        Better Products<br>
+        Better Life
+      </p>
+
+      <p class="footer-description">
+        অরিজিনাল ও মানসম্মত জুতার জন্য
+        Eyakub Shop-এর সাথে থাকুন।
+      </p>
+
+    </div>
+
+
     <div>
+
       <h4>কুইক লিংক</h4>
+
       <ul>
         <li><a href="#home">হোম</a></li>
         <li><a href="#products">শপ</a></li>
         <li><a href="#about">আমাদের সম্পর্কে</a></li>
+        <li><a href="#contact">যোগাযোগ</a></li>
       </ul>
+
     </div>
+
+
     <div>
+
+      <h4>কাস্টমার সার্ভিস</h4>
+
+      <ul>
+        <li>📦 অর্ডার সাপোর্ট</li>
+        <li>🚚 ডেলিভারি তথ্য</li>
+        <li>🔄 রিটার্ন নীতি</li>
+        <li>💬 WhatsApp সাপোর্ট</li>
+      </ul>
+
+    </div>
+
+
+    <div>
+
       <h4>যোগাযোগ</h4>
+
       <ul>
-        <li id="footerAddress">ঢাকা, বাংলাদেশ</li>
-        <li>WhatsApp: <span id="footerWa"></span></li>
+
+        <li id="footerAddress">
+          বাংলাদেশ
+        </li>
+
+        <li>
+          WhatsApp:
+          <strong id="footerWa">
+            966567225245
+          </strong>
+        </li>
+
+        <li>
+          <a
+            id="footerWaLink"
+            target="_blank"
+            rel="noopener">
+            💬 WhatsApp করুন
+          </a>
+        </li>
+
+        <li>
+          <a
+            href="https://www.facebook.com/profile.php?id=61594226919156"
+            target="_blank"
+            rel="noopener">
+            📘 Facebook Page
+          </a>
+        </li>
+
       </ul>
+
     </div>
-    <div>
-      <h4>গুরুত্বপূর্ণ লিংক</h4>
-      <ul>
-        <li><a href="admin.html">Admin Panel</a></li>
-        <li><a href="__FB_LINK__" target="_blank">Facebook Page</a></li>
-      </ul>
-    </div>
+
   </div>
+
+
   <div class="container footer-bottom">
-    <span>© <span id="yearNow"></span> Eyakub Shop — সর্বস্বত্ব সংরক্ষিত</span>
-    <span>Powered by GitHub Pages + Firebase</span>
+
+    <span>
+      © <span id="yearNow"></span>
+      Eyakub Shop — সর্বস্বত্ব সংরক্ষিত
+    </span>
+
+    <span>
+      Secure Shopping • Firebase
+    </span>
+
   </div>
+
 </footer>
 
-<a class="float-wa" id="floatWaBtn" target="_blank" title="WhatsApp-এ যোগাযোগ করুন">💬</a>
 
+<!-- ================= FLOATING WHATSAPP ================= -->
+<a
+  class="float-wa"
+  id="floatWaBtn"
+  target="_blank"
+  rel="noopener"
+  title="WhatsApp-এ যোগাযোগ করুন">
+  💬
+</a>
+
+
+<!-- ================= FIREBASE ================= -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script src="firebase-config.js"></script>
+
 <script src="app.js"></script>
+
+
+<!-- ================= BASIC SITE JS ================= -->
+<script>
+
+function toggleMobileMenu() {
+
+  const nav = document.getElementById("mainNav");
+
+  if (nav) {
+    nav.classList.toggle("mobile-open");
+  }
+
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const year = document.getElementById("yearNow");
+
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
+
+
+  /*
+   * Visitor-এর সামনে Admin link ইচ্ছাকৃতভাবে রাখা হয়নি।
+   * Admin access আলাদা admin.html + Firebase Authentication
+   * দিয়ে সুরক্ষিত থাকবে।
+   */
+
+
+  const whatsapp =
+    "https://wa.me/966567225245";
+
+
+  const ids = [
+    "waHeaderBtn",
+    "heroWhatsApp",
+    "waPromoBtn",
+    "floatWaBtn",
+    "footerWaLink",
+    "cartWhatsApp"
+  ];
+
+
+  ids.forEach(function (id) {
+
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.href = whatsapp;
+    }
+
+  });
+
+
+  const footerWa =
+    document.getElementById("footerWa");
+
+  if (footerWa) {
+    footerWa.textContent = "966567225245";
+  }
+
+});
+
+
+/*
+ * Search function fallback.
+ * app.js-এ doSearch থাকলে সেটিই ব্যবহার হবে।
+ */
+if (typeof window.doSearch !== "function") {
+
+  window.doSearch = function (event) {
+
+    if (event) {
+      event.preventDefault();
+    }
+
+    const input =
+      document.getElementById("searchInput");
+
+    const value =
+      input ? input.value.trim().toLowerCase() : "";
+
+    if (!value) {
+      return false;
+    }
+
+    const cards =
+      document.querySelectorAll(".product-card");
+
+    cards.forEach(function (card) {
+
+      const text =
+        card.textContent.toLowerCase();
+
+      card.style.display =
+        text.includes(value)
+          ? ""
+          : "none";
+
+    });
+
+    const products =
+      document.getElementById("products");
+
+    if (products) {
+      products.scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+    return false;
+  };
+
+}
+
+
+</script>
+
 </body>
-</html>
+             </html>
