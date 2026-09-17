@@ -1,5 +1,5 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyCHOSmHo_W_DPJHDbJy0jC-Alz3lJX7Qr0",
+  apiKey: "AIzaSyCHOSmHo_W_DPJHDbJy0jCq-Alz3lJX7Qr0",
   authDomain: "eyakub-shop.firebaseapp.com",
   projectId: "eyakub-shop",
   storageBucket: "eyakub-shop.firebasestorage.app",
@@ -23,10 +23,8 @@ const DEMO_PRODUCTS = [];
 
 try {
   firebase.initializeApp(firebaseConfig);
-
   db = firebase.firestore();
   auth = firebase.auth();
-
   FIREBASE_CONFIGURED = true;
 
   console.log("Firebase connected successfully");
