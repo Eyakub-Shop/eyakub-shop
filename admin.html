@@ -3,164 +3,953 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Eyakub Shop — Admin Panel</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="style.css">
+
 <style>
-  body{background:#F3F4F8;}
-  .admin-wrap{max-width:1100px; margin:0 auto; padding:24px 20px 60px;}
-  .admin-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;}
-  .admin-header h1{font-size:20px; margin:0;}
-  .btn{background:var(--indigo); color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:14px;}
-  .btn.secondary{background:#fff; color:var(--ink); border:1px solid var(--line);}
-  .btn.danger{background:var(--danger);}
-  .login-box{max-width:380px; margin:80px auto; background:#fff; padding:34px; border-radius:14px; box-shadow:var(--shadow);}
-  .login-box h2{margin-top:0;}
-  .login-box input{width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:8px; margin-bottom:12px; font-family:inherit; font-size:14px;}
-  .tabs{display:flex; gap:10px; margin-bottom:18px;}
-  .tab-btn{background:#fff; border:1px solid var(--line); padding:9px 18px; border-radius:999px; font-weight:700; font-size:13.5px;}
-  .tab-btn.active{background:var(--indigo); color:#fff; border-color:var(--indigo);}
-  .card{background:#fff; border-radius:12px; padding:20px; box-shadow:var(--shadow); margin-bottom:18px;}
-  table{width:100%; border-collapse:collapse; font-size:13.5px;}
-  th, td{text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle;}
-  th{color:var(--ink-soft); font-weight:700; font-size:12.5px; text-transform:uppercase;}
-  td img{width:44px; height:44px; object-fit:cover; border-radius:6px;}
-  .row-actions button{font-size:12px; padding:6px 10px; border-radius:6px; border:1px solid var(--line); background:#fff; margin-right:6px;}
-  .status-pill{padding:4px 10px; border-radius:999px; font-size:11.5px; font-weight:700; background:#FFF3CF; color:#8A6D00;}
-  .status-pill.done{background:#DDF5E4; color:#1C7A3D;}
-  .modal-overlay{position:fixed; inset:0; background:rgba(20,22,35,.55); display:none; align-items:center; justify-content:center; z-index:100; padding:20px;}
-  .modal-overlay.open{display:flex;}
-  .form-box{background:#fff; border-radius:14px; max-width:640px; width:100%; max-height:90vh; overflow-y:auto; padding:28px;}
-  .form-box h3{margin-top:0;}
-  .form-box label{display:block; font-size:13px; font-weight:700; margin:12px 0 6px;}
-  .form-box input, .form-box textarea{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px;}
-  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-  .thumb-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
-  .thumb-row .th-wrap{position:relative;}
-  .thumb-row img{width:64px; height:64px; object-fit:cover; border-radius:8px;}
-  .thumb-row .rm{position:absolute; top:-6px; right:-6px; background:var(--danger); color:#fff; border:none; width:20px; height:20px; border-radius:50%; font-size:12px;}
-  .form-actions{display:flex; gap:10px; margin-top:20px;}
-  .hint{font-size:12px; color:var(--ink-soft); margin-top:4px;}
-  .empty-note{color:var(--ink-soft); padding:20px 0; text-align:center;}
-  .config-warning{background:#FDECEC; border:1px solid #F3B9B9; color:#9A2A2A; padding:14px 18px; border-radius:10px; margin-bottom:20px; font-size:13.5px;}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#F3F4F8;
+  font-family:'Hind Siliguri','Segoe UI',sans-serif;
+  color:var(--ink);
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-box{
+  width:calc(100% - 30px);
+  max-width:400px;
+  margin:70px auto;
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  box-shadow:var(--shadow);
+}
+
+.login-logo{
+  text-align:center;
+  font-size:27px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.login-subtitle{
+  text-align:center;
+  color:var(--ink-soft);
+  font-size:13px;
+  margin:0 0 25px;
+}
+
+.login-box input{
+  width:100%;
+  padding:12px 14px;
+  margin-bottom:12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  outline:none;
+  font-family:inherit;
+  font-size:14px;
+}
+
+.login-box input:focus{
+  border-color:var(--indigo);
+}
+
+.login-btn{
+  width:100%;
+  padding:12px;
+  border:0;
+  border-radius:9px;
+  background:var(--indigo);
+  color:#fff;
+  font-size:15px;
+  font-weight:800;
+}
+
+.login-btn:hover{
+  background:var(--indigo-dark);
+}
+
+.login-error{
+  color:var(--danger);
+  font-size:13px;
+  margin:10px 0 0;
+  text-align:center;
+}
+
+
+/* =========================
+   ADMIN WRAPPER
+========================= */
+
+.admin-wrap{
+  width:100%;
+  max-width:1150px;
+  margin:auto;
+  padding:20px 15px 60px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.admin-header{
+  background:#fff;
+  border-radius:14px;
+  padding:16px 18px;
+  margin-bottom:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  box-shadow:var(--shadow);
+}
+
+.admin-header h1{
+  margin:0;
+  font-size:20px;
+  font-weight:800;
+}
+
+.admin-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+  border:0;
+  background:var(--indigo);
+  color:#fff;
+  padding:10px 16px;
+  border-radius:8px;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:800;
+}
+
+.btn:hover{
+  background:var(--indigo-dark);
+}
+
+.btn.secondary{
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+
+.btn.secondary:hover{
+  background:#F5F5F5;
+}
+
+.btn.danger{
+  background:var(--danger);
+}
+
+.btn.green{
+  background:#25D366;
+}
+
+
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:18px;
+}
+
+.tab-btn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  padding:9px 18px;
+  border-radius:999px;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:800;
+}
+
+.tab-btn.active{
+  background:var(--indigo);
+  color:#fff;
+  border-color:var(--indigo);
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow);
+}
+
+.card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-scroll{
+  width:100%;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+th,
+td{
+  padding:11px 8px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+}
+
+th{
+  color:var(--ink-soft);
+  font-size:12px;
+  font-weight:800;
+}
+
+td img{
+  width:48px;
+  height:48px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+.row-actions{
+  white-space:nowrap;
+}
+
+.row-actions button{
+  padding:6px 9px;
+  margin-right:4px;
+  border-radius:6px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-family:inherit;
+  font-size:11px;
+  font-weight:700;
+}
+
+.row-actions .edit-btn{
+  color:var(--indigo);
+}
+
+.row-actions .delete-btn{
+  color:var(--danger);
+}
+
+.status-pill{
+  display:inline-block;
+  padding:4px 9px;
+  border-radius:999px;
+  background:#FFF3CF;
+  color:#8A6D00;
+  font-size:11px;
+  font-weight:800;
+}
+
+.status-pill.done{
+  background:#DDF5E4;
+  color:#1C7A3D;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+  background:rgba(20,22,35,.65);
+  z-index:1000;
+}
+
+.modal-overlay.open{
+  display:flex;
+}
+
+.form-box{
+  width:100%;
+  max-width:680px;
+  max-height:92vh;
+  overflow-y:auto;
+  background:#fff;
+  border-radius:15px;
+  padding:24px;
+}
+
+.form-box h3{
+  margin:0 0 15px;
+  font-size:19px;
+}
+
+.form-box label{
+  display:block;
+  margin:13px 0 6px;
+  font-size:13px;
+  font-weight:800;
+}
+
+.form-box input,
+.form-box textarea{
+  width:100%;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  outline:none;
+  font-family:inherit;
+  font-size:14px;
+}
+
+.form-box input:focus,
+.form-box textarea:focus{
+  border-color:var(--indigo);
+}
+
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.hint{
+  margin:5px 0 0;
+  color:var(--ink-soft);
+  font-size:11.5px;
+}
+
+.thumb-row{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.th-wrap{
+  position:relative;
+}
+
+.thumb-row img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid var(--line);
+}
+
+.thumb-row .rm{
+  position:absolute;
+  top:-7px;
+  right:-7px;
+  width:21px;
+  height:21px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:var(--danger);
+  color:#fff;
+  font-size:12px;
+}
+
+.form-actions{
+  display:flex;
+  gap:10px;
+  margin-top:22px;
+}
+
+.form-actions .btn{
+  flex:1;
+}
+
+
+/* =========================
+   WARNING
+========================= */
+
+.config-warning{
+  background:#FDECEC;
+  border:1px solid #F3B9B9;
+  color:#9A2A2A;
+  padding:13px;
+  border-radius:9px;
+  margin-bottom:15px;
+  font-size:13px;
+}
+
+.empty-note{
+  padding:25px;
+  text-align:center;
+  color:var(--ink-soft);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  .login-box{
+    margin:35px auto;
+    padding:23px;
+  }
+
+  .admin-wrap{
+    padding:12px 10px 40px;
+  }
+
+  .admin-header{
+    padding:14px;
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .admin-header h1{
+    font-size:18px;
+  }
+
+  .admin-actions{
+    width:100%;
+  }
+
+  .admin-actions .btn{
+    flex:1;
+  }
+
+  .tabs{
+    overflow-x:auto;
+    padding-bottom:3px;
+  }
+
+  .tab-btn{
+    white-space:nowrap;
+  }
+
+  .card{
+    padding:13px;
+  }
+
+  .card-top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .card-top .btn{
+    width:100%;
+  }
+
+  .form-row{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+
+  .form-box{
+    padding:20px;
+  }
+
+}
+
+
+/* =========================
+   SMALL PHONE
+========================= */
+
+@media(max-width:420px){
+
+  .login-box{
+    width:calc(100% - 20px);
+  }
+
+  .admin-header{
+    border-radius:10px;
+  }
+
+  .admin-actions{
+    flex-direction:column;
+  }
+
+  .admin-actions .btn{
+    width:100%;
+  }
+
+  .form-actions{
+    flex-direction:column;
+  }
+
+}
+
 </style>
 </head>
+
 <body>
 
-<!-- ===== Login Screen ===== -->
+
+<!-- =====================================================
+     LOGIN SCREEN
+===================================================== -->
+
 <div class="login-box" id="loginBox">
-  <h2>🔐 Admin লগইন</h2>
-  <div id="configWarning" style="display:none" class="config-warning">
-    Firebase কনফিগার করা হয়নি। firebase-config.js ফাইলে আপনার Firebase তথ্য বসান, তাহলে লগইন ও ডাটাবেস কাজ করবে।
+
+  <div class="login-logo">
+    🔐 Eyakub Shop
   </div>
-  <input type="email" id="loginEmail" placeholder="Admin ইমেইল">
-  <input type="password" id="loginPass" placeholder="পাসওয়ার্ড">
-  <button class="btn" style="width:100%" onclick="doLogin()">লগইন করুন</button>
-  <p id="loginError" style="color:var(--danger); font-size:13px; margin-top:10px;"></p>
+
+  <p class="login-subtitle">
+    Secure Admin Panel
+  </p>
+
+  <div
+    id="configWarning"
+    class="config-warning"
+    style="display:none;"
+  >
+    Firebase কনফিগারেশন পাওয়া যায়নি।
+  </div>
+
+  <input
+    type="email"
+    id="loginEmail"
+    placeholder="Admin ইমেইল"
+    autocomplete="username"
+  >
+
+  <input
+    type="password"
+    id="loginPass"
+    placeholder="পাসওয়ার্ড"
+    autocomplete="current-password"
+  >
+
+  <button
+    class="login-btn"
+    onclick="doLogin()"
+  >
+    🔐 লগইন করুন
+  </button>
+
+  <p
+    id="loginError"
+    class="login-error"
+  ></p>
+
 </div>
 
-<!-- ===== Dashboard ===== -->
-<div class="admin-wrap" id="dashboard" style="display:none">
+
+
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
+
+<div
+  class="admin-wrap"
+  id="dashboard"
+  style="display:none;"
+>
+
   <div class="admin-header">
-    <h1>Eyakub Shop — Admin Panel</h1>
-    <div>
-      <a href="index.html" class="btn secondary" target="_blank">🌐 ওয়েবসাইট দেখুন</a>
-      <button class="btn secondary" onclick="doLogout()">লগআউট</button>
+
+    <h1>
+      🛍️ Eyakub Shop — Admin
+    </h1>
+
+    <div class="admin-actions">
+
+      <a
+        href="index.html"
+        class="btn secondary"
+        target="_blank"
+      >
+        🌐 Website
+      </a>
+
+      <button
+        class="btn secondary"
+        onclick="doLogout()"
+      >
+        🚪 Logout
+      </button>
+
     </div>
+
   </div>
+
+
+  <!-- TABS -->
 
   <div class="tabs">
-    <button class="tab-btn active" id="tabProductsBtn" onclick="switchTab('products')">📦 প্রোডাক্ট</button>
-    <button class="tab-btn" id="tabOrdersBtn" onclick="switchTab('orders')">🧾 অর্ডার সমূহ</button>
+
+    <button
+      class="tab-btn active"
+      id="tabProductsBtn"
+      onclick="switchTab('products')"
+    >
+      📦 প্রোডাক্ট
+    </button>
+
+    <button
+      class="tab-btn"
+      id="tabOrdersBtn"
+      onclick="switchTab('orders')"
+    >
+      🧾 অর্ডার
+    </button>
+
   </div>
 
-  <!-- Products Tab -->
+
+
+  <!-- =================================================
+       PRODUCTS
+  ================================================== -->
+
   <div id="tabProducts">
+
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <strong id="productTotalLabel">মোট প্রোডাক্ট: 0</strong>
-        <button class="btn" onclick="openProductForm()">+ নতুন প্রোডাক্ট যোগ করুন</button>
+
+      <div class="card-top">
+
+        <strong id="productTotalLabel">
+          মোট প্রোডাক্ট: 0
+        </strong>
+
+        <button
+          class="btn"
+          onclick="openProductForm()"
+        >
+          ➕ নতুন প্রোডাক্ট
+        </button>
+
       </div>
+
     </div>
+
+
     <div class="card">
-      <table>
-        <thead>
-          <tr><th>ছবি</th><th>নাম</th><th>দাম</th><th>স্টক</th><th>কালার/সাইজ</th><th>একশন</th></tr>
-        </thead>
-        <tbody id="productTableBody"></tbody>
-      </table>
+
+      <div class="table-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>ছবি</th>
+              <th>নাম</th>
+              <th>দাম</th>
+              <th>স্টক</th>
+              <th>কালার / সাইজ</th>
+              <th>একশন</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="productTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
+
   </div>
 
-  <!-- Orders Tab -->
-  <div id="tabOrders" style="display:none">
+
+
+  <!-- =================================================
+       ORDERS
+  ================================================== -->
+
+  <div
+    id="tabOrders"
+    style="display:none;"
+  >
+
     <div class="card">
-      <table>
-        <thead>
-          <tr><th>তারিখ</th><th>পণ্য</th><th>কাস্টমার</th><th>ফোন</th><th>ঠিকানা</th><th>পরিমাণ</th><th>স্ট্যাটাস</th></tr>
-        </thead>
-        <tbody id="ordersTableBody"></tbody>
-      </table>
+
+      <div class="table-scroll">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>তারিখ</th>
+              <th>পণ্য</th>
+              <th>কাস্টমার</th>
+              <th>ফোন</th>
+              <th>ঠিকানা</th>
+              <th>পরিমাণ</th>
+              <th>স্ট্যাটাস</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="ordersTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- ===== Product Form Modal ===== -->
-<div class="modal-overlay" id="productModal">
+
+
+<!-- =====================================================
+     PRODUCT FORM
+===================================================== -->
+
+<div
+  class="modal-overlay"
+  id="productModal"
+>
+
   <div class="form-box">
-    <h3 id="formTitle">নতুন প্রোডাক্ট যোগ করুন</h3>
-    <input type="hidden" id="pId">
 
-    <label>প্রোডাক্টের নাম *</label>
-    <input type="text" id="pName" placeholder="যেমন: ক্লাসিক লেদার লোফার">
+    <h3 id="formTitle">
+      নতুন প্রোডাক্ট যোগ করুন
+    </h3>
 
-    <label>ক্যাটাগরি</label>
-    <input type="text" id="pCategory" placeholder="যেমন: জুতা, স্যান্ডেল, স্পোর্টস শু">
+    <input
+      type="hidden"
+      id="pId"
+    >
+
+
+    <label>
+      প্রোডাক্টের নাম *
+    </label>
+
+    <input
+      type="text"
+      id="pName"
+      placeholder="যেমন: Premium Leather Shoe"
+    >
+
+
+    <label>
+      ক্যাটাগরি
+    </label>
+
+    <input
+      type="text"
+      id="pCategory"
+      placeholder="sneakers / formal / sandals / sports"
+    >
+
+    <p class="hint">
+      ক্যাটাগরি ইংরেজিতে দিলে Homepage-এর category filter-এর সাথে মিলবে।
+    </p>
+
 
     <div class="form-row">
+
       <div>
-        <label>বর্তমান মূল্য (৳) *</label>
-        <input type="number" id="pPrice" placeholder="1500">
+
+        <label>
+          বর্তমান মূল্য (৳) *
+        </label>
+
+        <input
+          type="number"
+          id="pPrice"
+          placeholder="1500"
+          min="0"
+        >
+
       </div>
+
+
       <div>
-        <label>আগের মূল্য (৳) — না থাকলে ফাঁকা রাখুন</label>
-        <input type="number" id="pOldPrice" placeholder="1800">
+
+        <label>
+          আগের মূল্য (৳)
+        </label>
+
+        <input
+          type="number"
+          id="pOldPrice"
+          placeholder="1800"
+          min="0"
+        >
+
       </div>
+
     </div>
+
+
 
     <div class="form-row">
+
       <div>
-        <label>স্টকে কতো পিছ আছে *</label>
-        <input type="number" id="pStock" placeholder="10">
+
+        <label>
+          স্টক *
+        </label>
+
+        <input
+          type="number"
+          id="pStock"
+          placeholder="10"
+          min="0"
+        >
+
       </div>
+
+
       <div>
-        <label>কালার (কমা দিয়ে আলাদা করুন)</label>
-        <input type="text" id="pColors" placeholder="কালো, বাদামি, সাদা">
+
+        <label>
+          কালার
+        </label>
+
+        <input
+          type="text"
+          id="pColors"
+          placeholder="কালো, বাদামি, সাদা"
+        >
+
       </div>
+
     </div>
 
-    <label>সাইজ (কমা দিয়ে আলাদা করুন)</label>
-    <input type="text" id="pSizes" placeholder="39, 40, 41, 42, 43">
 
-    <label>বিবরণ</label>
-    <textarea id="pDesc" rows="3" placeholder="প্রোডাক্টের বিস্তারিত বিবরণ লিখুন"></textarea>
 
-    <label>প্রোডাক্টের ছবি (একাধিক দেওয়া যাবে)</label>
-    <input type="file" id="pImages" accept="image/*" multiple onchange="handleImageUpload(event)">
-    <p class="hint">গ্যালারি থেকে ছবি বাছাই করুন। ছবি স্বয়ংক্রিয়ভাবে ছোট করে সংরক্ষণ করা হবে।</p>
-    <div class="thumb-row" id="imagePreviewRow"></div>
+    <label>
+      সাইজ
+    </label>
+
+    <input
+      type="text"
+      id="pSizes"
+      placeholder="39, 40, 41, 42, 43"
+    >
+
+
+    <label>
+      প্রোডাক্টের বিবরণ
+    </label>
+
+    <textarea
+      id="pDesc"
+      rows="4"
+      placeholder="প্রোডাক্টের বিস্তারিত বিবরণ..."
+    ></textarea>
+
+
+
+    <label>
+      প্রোডাক্টের ছবি
+    </label>
+
+    <input
+      type="file"
+      id="pImages"
+      accept="image/*"
+      multiple
+      onchange="handleImageUpload(event)"
+    >
+
+    <p class="hint">
+      Gallery থেকে একাধিক ছবি নির্বাচন করতে পারবেন।
+    </p>
+
+    <div
+      class="thumb-row"
+      id="imagePreviewRow"
+    ></div>
+
+
 
     <div class="form-actions">
-      <button class="btn" onclick="saveProduct()">💾 সংরক্ষণ করুন</button>
-      <button class="btn secondary" onclick="closeProductForm()">বাতিল</button>
+
+      <button
+        class="btn"
+        onclick="saveProduct()"
+      >
+        💾 সংরক্ষণ করুন
+      </button>
+
+      <button
+        class="btn secondary"
+        onclick="closeProductForm()"
+      >
+        বাতিল
+      </button>
+
     </div>
+
   </div>
+
 </div>
 
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <script src="firebase-config.js"></script>
+
 <script src="admin.js"></script>
+
+
 </body>
-</html>
+  </html>
