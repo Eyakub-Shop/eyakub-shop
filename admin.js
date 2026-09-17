@@ -1,242 +1,119 @@
-/* =========================================================
-   Eyakub Shop — Secure Admin Panel
-========================================================= */
+const ADMIN_EMAIL = "mdeyakub9970@gmail.com";
 
-let PRODUCTS = [];
-let ORDERS = [];
-let EDITING_ID = null;
-let PRODUCT_IMAGES = [];
+let editingProductId = null;
 
-
-/* =========================================================
-   YOUR ADMIN EMAIL
-========================================================= */
-
-const ADMIN_EMAIL = "mdeyakub095@gmail.com";
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function $(id) {
-  return document.getElementById(id);
-}
-
-function show(id) {
-  if ($(id)) {
-    $(id).style.display = "";
-  }
-}
-
-function hide(id) {
-  if ($(id)) {
-    $(id).style.display = "none";
-  }
-}
-
-function money(value) {
-  return "৳" + Number(value || 0).toLocaleString("en-US");
-}
-
-function escapeHtml(value) {
-  return String(value || "").replace(/[&<>"']/g, function(char) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[char];
-  });
-}
-
-
-/* =========================================================
-   FIREBASE AUTH
-========================================================= */
+// ===============================
+// AUTH CHECK
+// ===============================
 
 auth.onAuthStateChanged(function(user) {
 
-  if (!user) {
+  if (user) {
 
-    hide("dashboard");
-    show("loginBox");
+    if (user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+      alert("এই Email দিয়ে Admin Panel ব্যবহার করার অনুমতি নেই।");
+      auth.signOut();
+      return;
+    }
 
-    return;
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("adminDashboard").style.display = "block";
+
+    loadProducts();
+    loadOrders();
+
+  } else {
+
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("adminDashboard").style.display = "none";
+
   }
-
-
-  /* Only YOUR email can use Admin */
-
-  if (
-    user.email.toLowerCase() !==
-    ADMIN_EMAIL.toLowerCase()
-  ) {
-
-    auth.signOut();
-
-    $("loginError").textContent =
-      "এই Gmail-এর Admin Panel ব্যবহারের অনুমতি নেই।";
-
-    return;
-  }
-
-
-  /* Correct Admin */
-
-  hide("loginBox");
-  show("dashboard");
-
-  loadProducts();
-  loadOrders();
 
 });
 
 
-/* =========================================================
-   LOGIN
-========================================================= */
+// ===============================
+// LOGIN
+// ===============================
 
 async function doLogin() {
 
-  const email =
-    $("loginEmail").value.trim();
-
-  const password =
-    $("loginPass").value;
-
-
-  $("loginError").textContent = "";
-
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPass").value;
 
   if (!email || !password) {
-
-    $("loginError").textContent =
-      "Email এবং Password দিন।";
-
+    alert("Email এবং Password দিন।");
     return;
   }
 
-
-  /* Email must match Admin email */
-
-  if (
-    email.toLowerCase() !==
-    ADMIN_EMAIL.toLowerCase()
-  ) {
-
-    $("loginError").textContent =
-      "এই Email Admin হিসেবে অনুমোদিত নয়।";
-
+  if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    alert("এই Email Admin হিসেবে অনুমোদিত নয়।");
     return;
   }
-
 
   try {
 
-    await auth.signInWithEmailAndPassword(
-      email,
-      password
-    );
+    await auth.signInWithEmailAndPassword(email, password);
 
   } catch (error) {
 
     console.error(error);
 
-    let message =
-      "Login করা যায়নি।";
-
-
-    if (
-      error.code ===
-      "auth/invalid-credential"
-    ) {
-
-      message =
-        "Email অথবা Password ভুল।";
-
-    } else if (
-      error.code ===
-      "auth/user-not-found"
-    ) {
-
-      message =
-        "এই Email দিয়ে Firebase User তৈরি করা হয়নি।";
-
-    } else if (
-      error.code ===
-      "auth/wrong-password"
-    ) {
-
-      message =
-        "Password ভুল।";
-
-    } else if (
-      error.code ===
-      "auth/too-many-requests"
-    ) {
-
-      message =
-        "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।";
-
-    }
-
-
-    $("loginError").textContent =
-      message;
+    alert(
+      "লগইন করা যায়নি।\n\n" +
+      "Email অথবা Password ঠিক আছে কিনা দেখুন।\n\n" +
+      "Firebase Authentication-এ Email টি তৈরি করা হয়েছে কিনা নিশ্চিত করুন।"
+    );
 
   }
 
 }
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
+// ===============================
+// LOGOUT
+// ===============================
 
 async function doLogout() {
 
   try {
-
     await auth.signOut();
-
   } catch (error) {
-
     console.error(error);
-
   }
 
 }
 
 
-/* =========================================================
-   TAB SWITCH
-========================================================= */
+// ===============================
+// TAB SWITCH
+// ===============================
 
-function switchTab(tab) {
+function showTab(tabName) {
 
-  if (tab === "products") {
+  const productTab = document.getElementById("productsTab");
+  const ordersTab = document.getElementById("ordersTab");
 
-    show("tabProducts");
-    hide("tabOrders");
+  const productBtn = document.getElementById("productTabBtn");
+  const orderBtn = document.getElementById("orderTabBtn");
 
-    $("tabProductsBtn")
-      .classList.add("active");
+  if (tabName === "products") {
 
-    $("tabOrdersBtn")
-      .classList.remove("active");
+    if (productTab) productTab.style.display = "block";
+    if (ordersTab) ordersTab.style.display = "none";
 
-  } else {
+    if (productBtn) productBtn.classList.add("active");
+    if (orderBtn) orderBtn.classList.remove("active");
 
-    hide("tabProducts");
-    show("tabOrders");
+  }
 
-    $("tabProductsBtn")
-      .classList.remove("active");
+  if (tabName === "orders") {
 
-    $("tabOrdersBtn")
-      .classList.add("active");
+    if (productTab) productTab.style.display = "none";
+    if (ordersTab) ordersTab.style.display = "block";
+
+    if (productBtn) productBtn.classList.remove("active");
+    if (orderBtn) orderBtn.classList.add("active");
 
     loadOrders();
 
@@ -245,834 +122,196 @@ function switchTab(tab) {
 }
 
 
-/* =========================================================
-   LOAD PRODUCTS
-========================================================= */
+// ===============================
+// IMAGE COMPRESSION
+// ===============================
 
-async function loadProducts() {
+function compressImage(file, maxWidth = 900, quality = 0.75) {
 
-  try {
+  return new Promise((resolve, reject) => {
 
-    const snapshot =
-      await db
-        .collection("products")
-        .orderBy("createdAt", "desc")
-        .get();
+    const reader = new FileReader();
 
+    reader.onload = function(event) {
 
-    PRODUCTS =
-      snapshot.docs.map(function(doc) {
+      const img = new Image();
 
-        return {
-          id: doc.id,
-          ...doc.data()
-        };
+      img.onload = function() {
 
-      });
+        let width = img.width;
+        let height = img.height;
 
+        if (width > maxWidth) {
 
-    renderProducts();
+          height = Math.round(height * maxWidth / width);
+          width = maxWidth;
 
-  } catch (error) {
+        }
 
-    console.error(
-      "Product load error:",
-      error
-    );
+        const canvas = document.createElement("canvas");
 
+        canvas.width = width;
+        canvas.height = height;
 
-    /* Fallback */
+        const ctx = canvas.getContext("2d");
 
-    try {
+        ctx.drawImage(img, 0, 0, width, height);
 
-      const snapshot =
-        await db
-          .collection("products")
-          .get();
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
 
+        resolve(dataUrl);
 
-      PRODUCTS =
-        snapshot.docs.map(function(doc) {
+      };
 
-          return {
-            id: doc.id,
-            ...doc.data()
-          };
+      img.onerror = reject;
 
-        });
+      img.src = event.target.result;
 
+    };
 
-      PRODUCTS.sort(function(a, b) {
+    reader.onerror = reject;
 
-        return getTimestamp(b.createdAt) -
-               getTimestamp(a.createdAt);
-
-      });
-
-
-      renderProducts();
-
-    } catch (secondError) {
-
-      console.error(secondError);
-
-      $("productTableBody").innerHTML = `
-        <tr>
-          <td colspan="6">
-            <div class="empty-note">
-              প্রোডাক্ট লোড করা যায়নি।
-            </div>
-          </td>
-        </tr>
-      `;
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   RENDER PRODUCTS
-========================================================= */
-
-function renderProducts() {
-
-  const body =
-    $("productTableBody");
-
-
-  if (!body) {
-    return;
-  }
-
-
-  $("productTotalLabel").textContent =
-    "মোট প্রোডাক্ট: " +
-    PRODUCTS.length;
-
-
-  if (!PRODUCTS.length) {
-
-    body.innerHTML = `
-      <tr>
-        <td colspan="6">
-          <div class="empty-note">
-            এখনো কোনো প্রোডাক্ট যোগ করা হয়নি।
-          </div>
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-
-  body.innerHTML =
-    PRODUCTS.map(function(product) {
-
-      const image =
-        product.images &&
-        product.images.length
-          ? product.images[0]
-          : "";
-
-
-      const colors =
-        Array.isArray(product.colors)
-          ? product.colors.join(", ")
-          : "";
-
-
-      const sizes =
-        Array.isArray(product.sizes)
-          ? product.sizes.join(", ")
-          : "";
-
-
-      return `
-
-        <tr>
-
-          <td>
-            ${
-              image
-                ? `<img src="${image}" alt="">`
-                : "📦"
-            }
-          </td>
-
-
-          <td>
-
-            <strong>
-              ${escapeHtml(product.name)}
-            </strong>
-
-            ${
-              product.category
-                ? `
-                  <br>
-                  <small>
-                    ${escapeHtml(product.category)}
-                  </small>
-                `
-                : ""
-            }
-
-          </td>
-
-
-          <td>
-
-            <strong>
-              ${money(product.price)}
-            </strong>
-
-            ${
-              Number(product.oldPrice) >
-              Number(product.price)
-                ? `
-                  <br>
-                  <small style="text-decoration:line-through;">
-                    ${money(product.oldPrice)}
-                  </small>
-                `
-                : ""
-            }
-
-          </td>
-
-
-          <td>
-            ${Number(product.stock || 0)}
-          </td>
-
-
-          <td>
-
-            <small>
-              ${escapeHtml(colors || "—")}
-            </small>
-
-            <br>
-
-            <small>
-              সাইজ:
-              ${escapeHtml(sizes || "—")}
-            </small>
-
-          </td>
-
-
-          <td class="row-actions">
-
-            <button
-              class="edit-btn"
-              onclick="editProduct('${product.id}')"
-            >
-              ✏️ Edit
-            </button>
-
-            <button
-              class="delete-btn"
-              onclick="deleteProduct('${product.id}')"
-            >
-              🗑️ Delete
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
-
-}
-
-
-/* =========================================================
-   NEW PRODUCT
-========================================================= */
-
-function openProductForm() {
-
-  EDITING_ID = null;
-
-  PRODUCT_IMAGES = [];
-
-
-  $("formTitle").textContent =
-    "নতুন প্রোডাক্ট যোগ করুন";
-
-
-  $("pId").value = "";
-
-  $("pName").value = "";
-
-  $("pCategory").value = "";
-
-  $("pPrice").value = "";
-
-  $("pOldPrice").value = "";
-
-  $("pStock").value = "";
-
-  $("pColors").value = "";
-
-  $("pSizes").value = "";
-
-  $("pDesc").value = "";
-
-  $("pImages").value = "";
-
-
-  renderImagePreview();
-
-
-  $("productModal")
-    .classList.add("open");
-
-}
-
-
-/* =========================================================
-   CLOSE FORM
-========================================================= */
-
-function closeProductForm() {
-
-  $("productModal")
-    .classList.remove("open");
-
-}
-
-
-/* =========================================================
-   EDIT PRODUCT
-========================================================= */
-
-function editProduct(id) {
-
-  const product =
-    PRODUCTS.find(function(item) {
-
-      return item.id === id;
-
-    });
-
-
-  if (!product) {
-    return;
-  }
-
-
-  EDITING_ID = id;
-
-
-  $("formTitle").textContent =
-    "প্রোডাক্ট Edit করুন";
-
-
-  $("pId").value =
-    product.id || "";
-
-
-  $("pName").value =
-    product.name || "";
-
-
-  $("pCategory").value =
-    product.category || "";
-
-
-  $("pPrice").value =
-    product.price || "";
-
-
-  $("pOldPrice").value =
-    product.oldPrice || "";
-
-
-  $("pStock").value =
-    product.stock || "";
-
-
-  $("pColors").value =
-    Array.isArray(product.colors)
-      ? product.colors.join(", ")
-      : "";
-
-
-  $("pSizes").value =
-    Array.isArray(product.sizes)
-      ? product.sizes.join(", ")
-      : "";
-
-
-  $("pDesc").value =
-    product.description || "";
-
-
-  PRODUCT_IMAGES =
-    Array.isArray(product.images)
-      ? [...product.images]
-      : [];
-
-
-  $("pImages").value = "";
-
-
-  renderImagePreview();
-
-
-  $("productModal")
-    .classList.add("open");
-
-}
-
-
-/* =========================================================
-   IMAGE UPLOAD
-========================================================= */
-
-function handleImageUpload(event) {
-
-  const files =
-    Array.from(
-      event.target.files || []
-    );
-
-
-  if (!files.length) {
-    return;
-  }
-
-
-  files.forEach(function(file) {
-
-    if (
-      !file.type.startsWith("image/")
-    ) {
-      return;
-    }
-
-
-    compressImage(
-      file,
-      function(dataUrl) {
-
-        PRODUCT_IMAGES.push(
-          dataUrl
-        );
-
-        renderImagePreview();
-
-      }
-    );
+    reader.readAsDataURL(file);
 
   });
 
 }
 
 
-/* =========================================================
-   IMAGE COMPRESS
-========================================================= */
+// ===============================
+// ADD / UPDATE PRODUCT
+// ===============================
 
-function compressImage(
-  file,
-  callback
-) {
+async function saveProduct(event) {
 
-  const reader =
-    new FileReader();
+  if (event) event.preventDefault();
 
+  const name = document.getElementById("pName").value.trim();
+  const category = document.getElementById("pCategory").value.trim();
+  const price = Number(document.getElementById("pPrice").value);
+  const oldPrice = Number(document.getElementById("pOldPrice").value) || 0;
+  const stock = Number(document.getElementById("pStock").value) || 0;
 
-  reader.onload =
-    function(event) {
+  const colorsText = document.getElementById("pColors").value.trim();
+  const sizesText = document.getElementById("pSizes").value.trim();
+  const description = document.getElementById("pDesc").value.trim();
 
-      const image =
-        new Image();
-
-
-      image.onload =
-        function() {
-
-          const MAX_SIZE = 900;
-
-          let width =
-            image.width;
-
-          let height =
-            image.height;
-
-
-          if (width > height) {
-
-            if (width > MAX_SIZE) {
-
-              height =
-                height *
-                MAX_SIZE /
-                width;
-
-              width =
-                MAX_SIZE;
-
-            }
-
-          } else {
-
-            if (height > MAX_SIZE) {
-
-              width =
-                width *
-                MAX_SIZE /
-                height;
-
-              height =
-                MAX_SIZE;
-
-            }
-
-          }
-
-
-          const canvas =
-            document.createElement(
-              "canvas"
-            );
-
-
-          canvas.width =
-            Math.round(width);
-
-          canvas.height =
-            Math.round(height);
-
-
-          const context =
-            canvas.getContext("2d");
-
-
-          context.drawImage(
-            image,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-
-
-          const compressed =
-            canvas.toDataURL(
-              "image/jpeg",
-              0.75
-            );
-
-
-          callback(
-            compressed
-          );
-
-        };
-
-
-      image.src =
-        event.target.result;
-
-    };
-
-
-  reader.readAsDataURL(file);
-
-}
-
-
-/* =========================================================
-   IMAGE PREVIEW
-========================================================= */
-
-function renderImagePreview() {
-
-  const container =
-    $("imagePreviewRow");
-
-
-  if (!container) {
-    return;
-  }
-
-
-  if (!PRODUCT_IMAGES.length) {
-
-    container.innerHTML = `
-      <small style="color:#777;">
-        কোনো ছবি নির্বাচন করা হয়নি।
-      </small>
-    `;
-
-    return;
-  }
-
-
-  container.innerHTML =
-    PRODUCT_IMAGES.map(
-      function(image, index) {
-
-        return `
-
-          <div class="th-wrap">
-
-            <img
-              src="${image}"
-              alt=""
-            >
-
-            <button
-              type="button"
-              class="rm"
-              onclick="removeImage(${index})"
-            >
-              ×
-            </button>
-
-          </div>
-
-        `;
-
-      }
-    ).join("");
-
-}
-
-
-/* =========================================================
-   REMOVE IMAGE
-========================================================= */
-
-function removeImage(index) {
-
-  PRODUCT_IMAGES.splice(
-    index,
-    1
-  );
-
-  renderImagePreview();
-
-}
-
-
-/* =========================================================
-   SAVE PRODUCT
-========================================================= */
-
-async function saveProduct() {
-
-  const name =
-    $("pName").value.trim();
-
-
-  const category =
-    $("pCategory").value.trim();
-
-
-  const price =
-    Number(
-      $("pPrice").value
-    );
-
-
-  const oldPriceText =
-    $("pOldPrice").value.trim();
-
-
-  const oldPrice =
-    oldPriceText
-      ? Number(oldPriceText)
-      : 0;
-
-
-  const stock =
-    Number(
-      $("pStock").value
-    );
-
-
-  const colors =
-    $("pColors")
-      .value
-      .split(",")
-      .map(function(value) {
-
-        return value.trim();
-
-      })
-      .filter(Boolean);
-
-
-  const sizes =
-    $("pSizes")
-      .value
-      .split(",")
-      .map(function(value) {
-
-        return value.trim();
-
-      })
-      .filter(Boolean);
-
-
-  const description =
-    $("pDesc")
-      .value.trim();
-
-
-  /* Validation */
+  const imageInput = document.getElementById("pImages");
 
   if (!name) {
-
-    alert(
-      "প্রোডাক্টের নাম দিন।"
-    );
-
+    alert("প্রোডাক্টের নাম দিন।");
     return;
   }
 
-
-  if (
-    !Number.isFinite(price) ||
-    price <= 0
-  ) {
-
-    alert(
-      "সঠিক বর্তমান মূল্য দিন।"
-    );
-
+  if (!price || price <= 0) {
+    alert("সঠিক Price দিন।");
     return;
   }
 
+  const colors = colorsText
+    ? colorsText.split(",").map(x => x.trim()).filter(Boolean)
+    : [];
 
-  if (
-    !Number.isFinite(stock) ||
-    stock < 0
-  ) {
+  const sizes = sizesText
+    ? sizesText.split(",").map(x => x.trim()).filter(Boolean)
+    : [];
 
-    alert(
-      "সঠিক Stock সংখ্যা দিন।"
-    );
+  let images = [];
 
-    return;
+  // নতুন ছবি থাকলে
+  if (imageInput && imageInput.files.length > 0) {
+
+    try {
+
+      for (const file of imageInput.files) {
+
+        const compressed = await compressImage(file);
+
+        images.push(compressed);
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+      alert("ছবি আপলোড করতে সমস্যা হয়েছে।");
+      return;
+
+    }
+
   }
-
-
-  if (
-    oldPrice &&
-    oldPrice <= price
-  ) {
-
-    alert(
-      "আগের মূল্য বর্তমান মূল্যের চেয়ে বেশি দিন।"
-    );
-
-    return;
-  }
-
-
-  const productData = {
-
-    name: name,
-
-    category:
-      category.toLowerCase(),
-
-    price: price,
-
-    oldPrice: oldPrice,
-
-    stock: stock,
-
-    colors: colors,
-
-    sizes: sizes,
-
-    description: description,
-
-    images: [
-      ...PRODUCT_IMAGES
-    ],
-
-    updatedAt:
-      firebase.firestore
-        .FieldValue
-        .serverTimestamp()
-
-  };
-
 
   try {
 
-    /* EDIT */
+    if (editingProductId) {
 
-    if (EDITING_ID) {
+      const oldDoc = await db
+        .collection("products")
+        .doc(editingProductId)
+        .get();
+
+      const oldData = oldDoc.exists ? oldDoc.data() : {};
+
+      if (images.length === 0) {
+        images = oldData.images || [];
+      }
 
       await db
         .collection("products")
-        .doc(EDITING_ID)
-        .update(
-          productData
-        );
+        .doc(editingProductId)
+        .update({
 
+          name: name,
+          category: category.toLowerCase(),
+          price: price,
+          oldPrice: oldPrice,
+          stock: stock,
+          colors: colors,
+          sizes: sizes,
+          description: description,
+          images: images,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
 
-      alert(
-        "✅ প্রোডাক্ট সফলভাবে Update হয়েছে।"
-      );
+        });
 
+      alert("প্রোডাক্ট সফলভাবে আপডেট হয়েছে।");
+
+      editingProductId = null;
+
+    } else {
+
+      await db.collection("products").add({
+
+        name: name,
+        category: category.toLowerCase(),
+        price: price,
+        oldPrice: oldPrice,
+        stock: stock,
+        colors: colors,
+        sizes: sizes,
+        description: description,
+        images: images,
+
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+      alert("নতুন প্রোডাক্ট সফলভাবে যোগ হয়েছে।");
 
     }
 
-    /* NEW PRODUCT */
-
-    else {
-
-      productData.createdAt =
-        firebase.firestore
-          .FieldValue
-          .serverTimestamp();
-
-
-      await db
-        .collection("products")
-        .add(
-          productData
-        );
-
-
-      alert(
-        "✅ নতুন প্রোডাক্ট সফলভাবে যোগ হয়েছে।"
-      );
-
-    }
-
-
-    closeProductForm();
-
-    await loadProducts();
-
+    resetProductForm();
+    loadProducts();
 
   } catch (error) {
 
-    console.error(
-      "Save product error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
-      "❌ প্রোডাক্ট সংরক্ষণ করা যায়নি। Firebase Rules পরীক্ষা করুন।"
+      "প্রোডাক্ট Save করা যায়নি।\n\n" +
+      error.message
     );
 
   }
@@ -1080,36 +319,202 @@ async function saveProduct() {
 }
 
 
-/* =========================================================
-   DELETE PRODUCT
-========================================================= */
+// ===============================
+// LOAD PRODUCTS
+// ===============================
 
-async function deleteProduct(id) {
+async function loadProducts() {
 
-  const product =
-    PRODUCTS.find(function(item) {
+  const tbody = document.getElementById("productTableBody");
 
-      return item.id === id;
+  if (!tbody) return;
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="8">প্রোডাক্ট লোড হচ্ছে...</td>
+    </tr>
+  `;
+
+  try {
+
+    const snapshot = await db
+      .collection("products")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    if (snapshot.empty) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8">এখনো কোনো প্রোডাক্ট নেই।</td>
+        </tr>
+      `;
+
+      return;
+
+    }
+
+    tbody.innerHTML = "";
+
+    snapshot.forEach(doc => {
+
+      const p = {
+        id: doc.id,
+        ...doc.data()
+      };
+
+      const firstImage =
+        p.images && p.images.length
+          ? p.images[0]
+          : "";
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+
+        <td>
+          ${
+            firstImage
+              ? `<img src="${firstImage}"
+                    style="width:60px;height:60px;object-fit:cover;border-radius:8px;">`
+              : "📦"
+          }
+        </td>
+
+        <td>${escapeAdmin(p.name || "")}</td>
+
+        <td>${escapeAdmin(p.category || "")}</td>
+
+        <td>৳${Number(p.price || 0).toLocaleString("en-US")}</td>
+
+        <td>
+          ${
+            p.oldPrice
+              ? "৳" + Number(p.oldPrice).toLocaleString("en-US")
+              : "-"
+          }
+        </td>
+
+        <td>${Number(p.stock || 0)}</td>
+
+        <td>
+          ${
+            p.colors && p.colors.length
+              ? escapeAdmin(p.colors.join(", "))
+              : "-"
+          }
+        </td>
+
+        <td>
+
+          <button
+            onclick="editProduct('${p.id}')"
+            style="margin:3px;">
+            ✏️ Edit
+          </button>
+
+          <button
+            onclick="deleteProduct('${p.id}')"
+            style="margin:3px;">
+            🗑️ Delete
+          </button>
+
+        </td>
+
+      `;
+
+      tbody.appendChild(row);
 
     });
 
+  } catch (error) {
 
-  if (!product) {
-    return;
+    console.error(error);
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          প্রোডাক্ট লোড করা যায়নি।
+        </td>
+      </tr>
+    `;
+
   }
 
-
-  const confirmed =
-    confirm(
-      "আপনি কি এই প্রোডাক্টটি Delete করতে চান?\n\n" +
-      product.name
-    );
+}
 
 
-  if (!confirmed) {
-    return;
+// ===============================
+// EDIT PRODUCT
+// ===============================
+
+async function editProduct(id) {
+
+  try {
+
+    const doc = await db
+      .collection("products")
+      .doc(id)
+      .get();
+
+    if (!doc.exists) {
+
+      alert("প্রোডাক্ট পাওয়া যায়নি।");
+      return;
+
+    }
+
+    const p = doc.data();
+
+    editingProductId = id;
+
+    document.getElementById("pName").value = p.name || "";
+    document.getElementById("pCategory").value = p.category || "";
+    document.getElementById("pPrice").value = p.price || "";
+    document.getElementById("pOldPrice").value = p.oldPrice || "";
+    document.getElementById("pStock").value = p.stock || "";
+
+    document.getElementById("pColors").value =
+      p.colors ? p.colors.join(", ") : "";
+
+    document.getElementById("pSizes").value =
+      p.sizes ? p.sizes.join(", ") : "";
+
+    document.getElementById("pDesc").value =
+      p.description || "";
+
+    const title = document.getElementById("formTitle");
+
+    if (title) {
+      title.textContent = "প্রোডাক্ট Edit করুন";
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+    alert("প্রোডাক্ট Edit করা যায়নি।");
+
   }
 
+}
+
+
+// ===============================
+// DELETE PRODUCT
+// ===============================
+
+async function deleteProduct(id) {
+
+  const confirmDelete = confirm(
+    "আপনি কি নিশ্চিত এই প্রোডাক্টটি Delete করতে চান?"
+  );
+
+  if (!confirmDelete) return;
 
   try {
 
@@ -1118,25 +523,17 @@ async function deleteProduct(id) {
       .doc(id)
       .delete();
 
+    alert("প্রোডাক্ট Delete হয়েছে।");
 
-    alert(
-      "✅ প্রোডাক্ট Delete হয়েছে।"
-    );
-
-
-    await loadProducts();
-
+    loadProducts();
 
   } catch (error) {
 
-    console.error(
-      "Delete error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
-      "❌ প্রোডাক্ট Delete করা যায়নি।"
+      "Delete করা যায়নি।\n\n" +
+      error.message
     );
 
   }
@@ -1144,323 +541,210 @@ async function deleteProduct(id) {
 }
 
 
-/* =========================================================
-   LOAD ORDERS
-========================================================= */
+// ===============================
+// RESET FORM
+// ===============================
+
+function resetProductForm() {
+
+  editingProductId = null;
+
+  const form = document.getElementById("productForm");
+
+  if (form) {
+    form.reset();
+  }
+
+  const title = document.getElementById("formTitle");
+
+  if (title) {
+    title.textContent = "নতুন প্রোডাক্ট যোগ করুন";
+  }
+
+}
+
+
+// ===============================
+// LOAD ORDERS
+// ===============================
 
 async function loadOrders() {
 
-  const body =
-    $("ordersTableBody");
+  const tbody = document.getElementById("orderTableBody");
 
+  if (!tbody) return;
 
-  if (!body) {
-    return;
-  }
-
-
-  body.innerHTML = `
+  tbody.innerHTML = `
     <tr>
-      <td colspan="7">
-        <div class="empty-note">
-          অর্ডার লোড হচ্ছে...
-        </div>
-      </td>
+      <td colspan="10">অর্ডার লোড হচ্ছে...</td>
     </tr>
   `;
 
-
   try {
 
-    const snapshot =
-      await db
-        .collection("orders")
-        .orderBy("createdAt", "desc")
-        .get();
+    const snapshot = await db
+      .collection("orders")
+      .orderBy("createdAt", "desc")
+      .get();
 
+    if (snapshot.empty) {
 
-    ORDERS =
-      snapshot.docs.map(function(doc) {
-
-        return {
-          id: doc.id,
-          ...doc.data()
-        };
-
-      });
-
-
-    renderOrders();
-
-
-  } catch (error) {
-
-    console.error(
-      "Order load error:",
-      error
-    );
-
-
-    try {
-
-      const snapshot =
-        await db
-          .collection("orders")
-          .get();
-
-
-      ORDERS =
-        snapshot.docs.map(function(doc) {
-
-          return {
-            id: doc.id,
-            ...doc.data()
-          };
-
-        });
-
-
-      ORDERS.sort(function(a, b) {
-
-        return getTimestamp(b.createdAt) -
-               getTimestamp(a.createdAt);
-
-      });
-
-
-      renderOrders();
-
-
-    } catch (secondError) {
-
-      console.error(
-        secondError
-      );
-
-
-      body.innerHTML = `
+      tbody.innerHTML = `
         <tr>
-          <td colspan="7">
-            <div class="empty-note">
-              অর্ডার লোড করা যায়নি।
-            </div>
-          </td>
+          <td colspan="10">এখনো কোনো অর্ডার নেই।</td>
         </tr>
       `;
 
+      return;
+
     }
 
-  }
+    tbody.innerHTML = "";
 
-}
+    snapshot.forEach(doc => {
 
+      const o = {
+        id: doc.id,
+        ...doc.data()
+      };
 
-/* =========================================================
-   RENDER ORDERS
-========================================================= */
+      const row = document.createElement("tr");
 
-function renderOrders() {
+      row.innerHTML = `
 
-  const body =
-    $("ordersTableBody");
+        <td>
+          ${escapeAdmin(o.productName || "-")}
+        </td>
 
+        <td>
+          ${escapeAdmin(o.customerName || "-")}
+        </td>
 
-  if (!body) {
-    return;
-  }
+        <td>
+          ${escapeAdmin(o.customerPhone || "-")}
+        </td>
 
+        <td>
+          ${escapeAdmin(o.customerAddress || "-")}
+        </td>
 
-  if (!ORDERS.length) {
+        <td>
+          ${escapeAdmin(o.color || "-")}
+        </td>
 
-    body.innerHTML = `
+        <td>
+          ${escapeAdmin(o.size || "-")}
+        </td>
+
+        <td>
+          ${Number(o.qty || 1)}
+        </td>
+
+        <td>
+          ৳${Number(
+            (o.price || 0) * (o.qty || 1)
+          ).toLocaleString("en-US")}
+        </td>
+
+        <td>
+          <button
+            onclick="toggleOrderStatus('${o.id}', '${o.status || "নতুন"}')">
+            ${escapeAdmin(o.status || "নতুন")}
+          </button>
+        </td>
+
+        <td>
+          <button
+            onclick="deleteOrder('${o.id}')">
+            🗑️
+          </button>
+        </td>
+
+      `;
+
+      tbody.appendChild(row);
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    tbody.innerHTML = `
       <tr>
-        <td colspan="7">
-          <div class="empty-note">
-            এখনো কোনো অর্ডার নেই।
-          </div>
+        <td colspan="10">
+          অর্ডার লোড করা যায়নি।
         </td>
       </tr>
     `;
 
-    return;
   }
-
-
-  body.innerHTML =
-    ORDERS.map(function(order) {
-
-      const date =
-        formatDate(
-          order.createdAt
-        );
-
-
-      const status =
-        order.status ||
-        "নতুন";
-
-
-      const isDone =
-        status === "সম্পন্ন";
-
-
-      return `
-
-        <tr>
-
-          <td>
-            ${date}
-          </td>
-
-
-          <td>
-
-            <strong>
-              ${escapeHtml(
-                order.productName
-              )}
-            </strong>
-
-            <br>
-
-            <small>
-              কালার:
-              ${escapeHtml(
-                order.color || "—"
-              )}
-
-              <br>
-
-              সাইজ:
-              ${escapeHtml(
-                order.size || "—"
-              )}
-            </small>
-
-          </td>
-
-
-          <td>
-            ${escapeHtml(
-              order.customerName
-            )}
-          </td>
-
-
-          <td>
-
-            <a
-              href="tel:${escapeHtml(
-                order.customerPhone
-              )}"
-            >
-              ${escapeHtml(
-                order.customerPhone
-              )}
-            </a>
-
-          </td>
-
-
-          <td>
-            ${escapeHtml(
-              order.customerAddress
-            )}
-          </td>
-
-
-          <td>
-            ${Number(
-              order.qty || 0
-            )}
-          </td>
-
-
-          <td>
-
-            <span
-              class="status-pill ${
-                isDone ? "done" : ""
-              }"
-            >
-              ${escapeHtml(status)}
-            </span>
-
-            <br>
-
-            <button
-              style="
-                margin-top:6px;
-                border:1px solid #ddd;
-                background:#fff;
-                border-radius:6px;
-                padding:5px 8px;
-                font-family:inherit;
-                font-size:11px;
-              "
-              onclick="toggleOrderStatus(
-                '${order.id}',
-                '${isDone ? "নতুন" : "সম্পন্ন"}'
-              )"
-            >
-              ${
-                isDone
-                  ? "↩ নতুন করুন"
-                  : "✓ সম্পন্ন করুন"
-              }
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }).join("");
 
 }
 
 
-/* =========================================================
-   CHANGE ORDER STATUS
-========================================================= */
+// ===============================
+// ORDER STATUS
+// ===============================
 
-async function toggleOrderStatus(
-  orderId,
-  newStatus
-) {
+async function toggleOrderStatus(id, currentStatus) {
+
+  let newStatus = "সম্পন্ন";
+
+  if (currentStatus === "সম্পন্ন") {
+    newStatus = "নতুন";
+  }
 
   try {
 
     await db
       .collection("orders")
-      .doc(orderId)
+      .doc(id)
       .update({
-
-        status:
-          newStatus,
-
-        updatedAt:
-          firebase.firestore
-            .FieldValue
-            .serverTimestamp()
-
+        status: newStatus
       });
 
-
-    await loadOrders();
-
+    loadOrders();
 
   } catch (error) {
 
-    console.error(
-      "Order status error:",
-      error
-    );
+    console.error(error);
 
+    alert("Order status পরিবর্তন করা যায়নি।");
+
+  }
+
+}
+
+
+// ===============================
+// DELETE ORDER
+// ===============================
+
+async function deleteOrder(id) {
+
+  const ok = confirm(
+    "আপনি কি এই অর্ডারটি Delete করতে চান?"
+  );
+
+  if (!ok) return;
+
+  try {
+
+    await db
+      .collection("orders")
+      .doc(id)
+      .delete();
+
+    loadOrders();
+
+  } catch (error) {
+
+    console.error(error);
 
     alert(
-      "Order status পরিবর্তন করা যায়নি।"
+      "Order Delete করা যায়নি।\n\n" +
+      error.message
     );
 
   }
@@ -1468,110 +752,53 @@ async function toggleOrderStatus(
 }
 
 
-/* =========================================================
-   DATE
-========================================================= */
+// ===============================
+// HTML SECURITY
+// ===============================
 
-function getTimestamp(value) {
+function escapeAdmin(value) {
 
-  if (!value) {
-    return 0;
-  }
+  return String(value || "").replace(
+    /[&<>"']/g,
+    function(m) {
 
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
 
-  if (
-    typeof value.toMillis ===
-    "function"
-  ) {
+      }[m];
 
-    return value.toMillis();
-
-  }
-
-
-  if (value.seconds) {
-
-    return value.seconds * 1000;
-
-  }
-
-
-  const date =
-    new Date(value);
-
-
-  return date.getTime() || 0;
+    }
+  );
 
 }
 
 
-function formatDate(value) {
+// ===============================
+// ENTER KEY LOGIN
+// ===============================
 
-  const timestamp =
-    getTimestamp(value);
+document.addEventListener("DOMContentLoaded", function() {
 
+  const passwordInput =
+    document.getElementById("loginPass");
 
-  if (!timestamp) {
-    return "—";
-  }
+  if (passwordInput) {
 
-
-  return new Date(timestamp)
-    .toLocaleString(
-      "bn-BD",
-      {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-      }
-    );
-
-}
-
-
-/* =========================================================
-   CLOSE MODAL BY CLICKING OUTSIDE
-========================================================= */
-
-if ($("productModal")) {
-
-  $("productModal")
-    .addEventListener(
-      "click",
+    passwordInput.addEventListener(
+      "keydown",
       function(event) {
 
-        if (
-          event.target.id ===
-          "productModal"
-        ) {
-
-          closeProductForm();
-
+        if (event.key === "Enter") {
+          doLogin();
         }
 
       }
     );
 
-}
-
-
-/* =========================================================
-   ESC KEY
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  function(event) {
-
-    if (
-      event.key === "Escape"
-    ) {
-
-      closeProductForm();
-
-    }
-
   }
-);
+
+});
