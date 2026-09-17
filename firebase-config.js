@@ -1,9 +1,5 @@
-/* =========================================================
-   Eyakub Shop — Firebase Configuration
-========================================================= */
-
 const firebaseConfig = {
-  apiKey: "AIzaSyCHOSMHoW_DPJHDbJy0jCq-Alz3lJX7Qr0",
+  apiKey: "AIzaSyCHOSmHo_W_DPJHDbJy0jC-Alz3lJX7Qr0",
   authDomain: "eyakub-shop.firebaseapp.com",
   projectId: "eyakub-shop",
   storageBucket: "eyakub-shop.firebasestorage.app",
@@ -12,44 +8,28 @@ const firebaseConfig = {
   measurementId: "G-CB9F51HVS1"
 };
 
-
-/* =========================
-   Initialize Firebase
-========================= */
-
-firebase.initializeApp(firebaseConfig);
-
-
-/* =========================
-   Firebase Services
-========================= */
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-
-/* =========================
-   Shop Information
-========================= */
+let FIREBASE_CONFIGURED = false;
+let db = null;
+let auth = null;
 
 const SHOP_INFO = {
   name: "Eyakub Shop",
-  whatsapp: "966567225245",
-  facebook: "https://www.facebook.com/profile.php?id=61594226919156",
   tagline: "অরিজিনাল জুতার সেরা কালেকশন",
-  address: "বাংলাদেশ"
+  whatsapp: "966567225245",
+  address: "ঢাকা, বাংলাদেশ"
 };
 
-
-/* =========================
-   Firebase Status
-========================= */
-
-const FIREBASE_CONFIGURED = true;
-
-
-/* =========================
-   Demo Products
-========================= */
-
 const DEMO_PRODUCTS = [];
+
+try {
+  firebase.initializeApp(firebaseConfig);
+
+  db = firebase.firestore();
+  auth = firebase.auth();
+
+  FIREBASE_CONFIGURED = true;
+
+  console.log("Firebase connected successfully");
+} catch (error) {
+  console.error("Firebase initialization failed:", error);
+}
